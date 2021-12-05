@@ -1,6 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-12-04T21:44:32-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Shai Bianchi</title><subtitle>MS in Computer Science, software engineer and entrepreneur.</subtitle><entry><title type="html">ML Ops: A Fictional Case Study | Chapter I</title><link href="http://localhost:4000/technology/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study | Chapter I" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>http://localhost:4000/technology/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="http://localhost:4000/technology/2021/12/04/ml-ops-fict-1.html">&lt;h2 id=&quot;the-case&quot;&gt;The case&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-12-05T20:34:41-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Shai Bianchi</title><subtitle>A blog about my tech, my work and otherwise interesting things</subtitle><author><name>Shai Bianchi</name></author><entry><title type="html">ML Ops: A Fictional Case Study - Chapter I</title><link href="http://localhost:4000/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study - Chapter I" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>http://localhost:4000/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="http://localhost:4000/2021/12/04/ml-ops-fict-1.html">&lt;div id=&quot;entry-table-of-contents&quot; class=&quot;toc-wrapper&quot;&gt;
+  &lt;h2 id=&quot;toc-toggle&quot; class=&quot;no_toc&quot;&gt;
+  Table of Contents &lt;i class=&quot;toc-toggle-icon fas fa-chevron-down&quot;&gt;&lt;/i&gt;
+&lt;/h2&gt;
+&lt;ol id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-case&quot; id=&quot;markdown-toc-the-case&quot;&gt;The case&lt;/a&gt;    &lt;ol&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-product&quot; id=&quot;markdown-toc-the-product&quot;&gt;The product&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-implementation&quot; id=&quot;markdown-toc-the-implementation&quot;&gt;The implementation&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-problem&quot; id=&quot;markdown-toc-the-problem&quot;&gt;The problem&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#an-initial-solution&quot; id=&quot;markdown-toc-an-initial-solution&quot;&gt;An initial solution&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#what-about-the-next-time&quot; id=&quot;markdown-toc-what-about-the-next-time&quot;&gt;What about the next time?&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#what-about-new-algorithms&quot; id=&quot;markdown-toc-what-about-new-algorithms&quot;&gt;What about new algorithms?&lt;/a&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#enter-ml-ops&quot; id=&quot;markdown-toc-enter-ml-ops&quot;&gt;Enter ML Ops&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#palanca-and-the-next-chapter&quot; id=&quot;markdown-toc-palanca-and-the-next-chapter&quot;&gt;&lt;em&gt;Palanca&lt;/em&gt; and the Next Chapter&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
-&lt;p&gt;Today I’d like to walk you through how ML Ops, and Palanca’s ML Ops solutions in particular, might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Today I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-case&quot;&gt;The case&lt;/h2&gt;
 
 &lt;p&gt;So, meet Riley, an engineer at &lt;em&gt;Nicr&lt;/em&gt;. Nicr is a small startup developing a new model of interaction in social networks. Of course, I just made both Riley and nicr up completely. But bear with me; it will be worth it. Plus, you might just end up with an inspiring idea for a brand new social network after reading this article! That can’t be too bad now, can it?&lt;/p&gt;
 
@@ -28,7 +48,7 @@
 
 &lt;p&gt;So far so good.&lt;/p&gt;
 
-&lt;p&gt;[note futuro challenge de Nicr podría ser deployar modelo a celu si por ejemplo empiezan a soportar feedback en vivo con cada palabra que se tipea -&amp;gt; considerar si Palanca ofrece edge deployment tipo OctoML].&lt;/p&gt;
+&lt;!--[note futuro challenge de Nicr podría ser deployar modelo a celu si por ejemplo empiezan a soportar feedback en vivo con cada palabra que se tipea -&gt; considerar si Palanca ofrece edge deployment tipo OctoML].--&gt;
 
 &lt;h3 id=&quot;the-problem&quot;&gt;The problem&lt;/h3&gt;
 
@@ -47,7 +67,7 @@
   &lt;li&gt;&lt;em&gt;How might we validate the new model is better than the old one?&lt;/em&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;Having been in charge of shipping the nice-a-meter initially, Riley takes on this task. Digging back into search engines Hugging Face’s Transformers docs, she learns that their model can be fine-tuned with custom datasets, and that once such a dataset is ready it could also be used to validate the new model’s performance by running it on train/test splits or cross validation. In need of a dataset [note dataset feature], Riley mines the logs for samples that include interesting cases of mis-classification &lt;!--[note &quot;no siempre va a ser tan fácil&quot; e.g mucha data o imágenes]--&gt; to be manually supervised, &lt;del&gt;&lt;!--[note ordering by prob]--&gt;&lt;/del&gt; and tagging work is divided among the team &lt;del&gt;&lt;!--[note &quot;no siempre se va a poder hacer&quot;, dividir la data entre muchos tampoco es fácil, le quita mucho tiempo a todos]--&gt;&lt;/del&gt;.&lt;/p&gt;
+&lt;p&gt;Having been in charge of shipping the nice-a-meter initially, Riley takes on this task. Digging back into search engines Hugging Face’s Transformers docs, she learns that their model can be fine-tuned with custom datasets, and that once such a dataset is ready it could also be used to validate the new model’s performance by running it on train/test splits or cross validation. In need of a dataset &lt;!--[note dataset feature]--&gt;, Riley mines the logs for samples that include interesting cases of mis-classification &lt;!--[note &quot;no siempre va a ser tan fácil&quot; e.g mucha data o imágenes]--&gt; to be manually supervised, &lt;!--[note ordering by prob]--&gt; and tagging work is divided among the team &lt;!--[note &quot;no siempre se va a poder hacer&quot;, dividir la data entre muchos tampoco es fácil, le quita mucho tiempo a todos]--&gt;.&lt;/p&gt;
 
 &lt;p&gt;As for the fine-tuning code, it becomes clear to Riley that this will not be as breezy as setting up the out-of-the-box model was; a decent amount more of research and trial-and-error is required. But, before long, her fine-tuning code is ready to go. With the dataset all cooked up, a new model is trained and to encouraging results: running some metrics on the test split using the old model and the new one shows a significant improvement, validating the team’s suspicions and their efforts towards a fix. The new model is deployed in much the same way that the first one was, with Riley manually uploading it to a server’s disk, creating a new image and rolling it out using her cloud computing service’s general-purpose deployment functionalities.&lt;/p&gt;
 
@@ -69,19 +89,19 @@
 
 &lt;p&gt;It couldn’t be any clearer to Riley that a better solution is needed.&lt;/p&gt;
 
-&lt;h2 id=&quot;enter-palanca&quot;&gt;Enter Palanca&lt;/h2&gt;
+&lt;h2 id=&quot;enter-ml-ops&quot;&gt;Enter ML Ops&lt;/h2&gt;
 
 &lt;p&gt;Let’s take a step back and have a look at the bigger picture. Riley and Nicr’s fictional case makes the following point: things get really messy as the use of Machine Learning is extended in application and in time within an organization. Scaling ML models, keeping training data up-to-date and ensuring models are in tip-top shape is hard, and becomes harder as the number of models increase and the kinds of problems they’re applied to diversifies.&lt;/p&gt;
 
 &lt;p&gt;That’s where ML Ops, or Machine Learning Operations, come in. Think about it this way: nowadays, you wouldn’t dream of scaling a software development effort without practicing proper DevOps. Just as with DevOps for development, a means of standardizing processes and incorporating reliable and flexible automation is the key to success in scaling with Machine Learning.&lt;/p&gt;
 
-&lt;p&gt;At Palanca, we’re committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we’re also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.&lt;/p&gt;
+&lt;h2 id=&quot;palanca-and-the-next-chapter&quot;&gt;&lt;em&gt;Palanca&lt;/em&gt; and the Next Chapter&lt;/h2&gt;
+
+&lt;p&gt;With this observation in mind, the idea for &lt;a href=&quot;https://www.gopalanca.com/&quot;&gt;&lt;em&gt;Palanca&lt;/em&gt;&lt;/a&gt; was born. At Palanca, we’re committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we’re also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.&lt;/p&gt;
 
 &lt;p&gt;Bringing our prior experience in the field to the table and levaraging the latest tools and infrastructure technology, whether by custom-made solutions or through a powerful dashboard, we’re eager to help businesses maximize their ML potential by facing the kinds of challenges exemplified here, and more, successfully.&lt;/p&gt;
 
-&lt;h2 id=&quot;in-the-next-chapter&quot;&gt;In the Next Chapter&lt;/h2&gt;
-
-&lt;p&gt;As is probably clear by now, we’re pretty confident we’d have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.&lt;/p&gt;
+&lt;p&gt;So, as is probably clear by now, we’re pretty confident we’d have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.&lt;/p&gt;
 
 &lt;p&gt;In a following article, we’ll take a good look at how this might happen. We’ll present ML Ops practices and some of the most exciting features of our work-in-progress tool by examining in detail how Riley and her team might have levaraged them to great advantage.&lt;/p&gt;
 
@@ -90,4 +110,16 @@
 &lt;!--[Encontrar la manera de mencionar otros features que se desprenden de tener algo así como el poder trackear historial de modelos (para e.g eventualmente decidirse por cambio de arquitectura de red), versionado y rollbacks, sandboxing para experimentar etc, cálculo de métricas subseleccionando features de la data.]--&gt;
 &lt;!--[Sugerir al final somehow que el producto no está terminado y veríamos qué necesidades tiene cada cliente?]--&gt;
 &lt;!--[Que quede claro que el punto es que las necesidades específicas o idiosincráticas no tardan en aparecer ni tampoco lo hace la multiplicidad de modelos.]--&gt;
-&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name></name></author><category term="technology" /><summary type="html">The case</summary></entry></feed>
+&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name>Shai Bianchi</name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Table of Contents</summary></entry><entry><title type="html">Palanca’s Mission Statement</title><link href="http://localhost:4000/2021/11/16/palanca-mission-statement.html" rel="alternate" type="text/html" title="Palanca’s Mission Statement" /><published>2021-11-16T14:13:00-03:00</published><updated>2021-11-16T14:13:00-03:00</updated><id>http://localhost:4000/2021/11/16/palanca-mission-statement</id><content type="html" xml:base="http://localhost:4000/2021/11/16/palanca-mission-statement.html">&lt;h1 id=&quot;so-whats-ml-ops-all-about&quot;&gt;So What’s ML Ops All About?&lt;/h1&gt;
+
+&lt;p&gt;Nowadays, Machine Learning is ubiqutous across all manner of industries and applications. Accordingly, implementing Machine Learning solutions has become increasingly easy, with an ever-growing ecosystem of tools that facilitate its powers to software development teams who no longer require highly specialized hires in order to take advantage of it. If a software developer needs a Machine Learning algorithm to solve a problem or deliver a feature, they can count on a wide variety of free and effective tools to get them all the way up to a decently accurate and performant model.&lt;/p&gt;
+
+&lt;p&gt;However, a model then needs to be deployed and be made accesible for use in production. Deployment in itself is challenging enough with issues of language, compilation, hardware and cost management to consider, but then the model also has to be monitored for drift, re-trained, re-tuned and re-deployed. As a product grows and evolves, this cycle needs to be repeated in a timely fashion to avoid degradation in quality. Further, while all of this may be tractable at a small scale by handling it manually and in an unstructured way, what happens when a second model is required? And a third? To make things worse, what if subsequent models also diverge in the kind of data they use for training, hardware requirements or software dependencies?&lt;/p&gt;
+
+&lt;p&gt;After focusing on the science and algorithms in themselves, the software industry is now increasingly concerned with these kinds of problems; it is facing the &lt;em&gt;operationalization&lt;/em&gt; of Machine Learning solutions. This is where the field of &lt;em&gt;Machine Learning Operations&lt;/em&gt;, or &lt;em&gt;ML Ops&lt;/em&gt;, comes into play. Just as things have unfolded industry-wise, so they would naturally evolve for a development team working out a concrete problem. Once an ML solution is crafted and integrated into a system, the need for ML Ops will not be far behind in making itself evident.&lt;/p&gt;
+
+&lt;h1 id=&quot;enter-palanca&quot;&gt;Enter &lt;em&gt;Palanca&lt;/em&gt;&lt;/h1&gt;
+
+&lt;p&gt;At &lt;a href=&quot;https://www.gopalanca.com/&quot;&gt;&lt;em&gt;Palanca&lt;/em&gt;&lt;/a&gt;, we have set out on a journey to help teams tackle this very challenge. We believe strongly that any ML Ops solution worth considering should make working with Machine Learning smooth, productive and enjoyable. With our experience in ML in both academic and industrial settings and having grappled with many of the issues this usually entails, we’ve become passionate about creating tools that will deliver data scientists and engineers the opportunity to make their ML operations a delight.&lt;/p&gt;
+
+&lt;p&gt;Consider reading some more about what we do in other &lt;em&gt;ml-ops&lt;/em&gt; or &lt;em&gt;palanca&lt;/em&gt; -tagged articles, check out our website at &lt;a href=&quot;https://www.gopalanca.com/&quot;&gt;https://www.gopalanca.com/&lt;/a&gt; and feel free to get in touch with any comments or questions at &lt;a href=&quot;mailto:contact@gopalanca.com&quot;&gt;contact@gopalanca.com&lt;/a&gt; or via my personal contact info.&lt;/p&gt;</content><author><name>Shai Bianchi</name></author><category term="ml-ops" /><category term="tech" /><category term="palanca" /><summary type="html">So What’s ML Ops All About?</summary></entry></feed>
