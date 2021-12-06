@@ -120,7 +120,7 @@ table td { border: 1px solid #e8e8e8; }
 
 .page-heading { font-size: 32px; }
 
-.post-list-heading { font-size: 28px; }
+.post-list-heading { font-size: 28px; color: #343434; margin-top: 1em; }
 
 .post-list { margin-left: 0; list-style: none; }
 
@@ -130,11 +130,17 @@ table td { border: 1px solid #e8e8e8; }
 
 .post-link { display: block; font-size: 24px; }
 
-.about-container { display: flex; flex-direction: row; margin-bottom: 3em; justify-content: space-between; }
+.masthead-container { display: flex; flex-direction: column; }
 
-.about-content { display: flex; flex-direction: column; }
+.masthead-title { align-self: center; font-size: 26px; font-weight: 300; line-height: 54px; color: #3f3f3f; margin-bottom: 0; }
 
-.about-profile-pic { border-radius: 100%; width: 35%; }
+.masthead-content { display: flex; flex-direction: column; margin: 0.5em; }
+
+.masthead-content-title { font-weight: lighter; align-self: center; max-width: 40%; text-align: center; }
+
+.masthead-content-text { align-self: center; margin: 0.75em; max-width: 60%; text-align: center; }
+
+.masthead-profile-pic { align-self: center; border-radius: 100%; width: 25%; }
 
 /** Posts */
 .post-header { margin-bottom: 30px; }

@@ -187,6 +187,7 @@
 .post-list-heading {
   @include relative-font-size(1.75);
   color: #343434;
+  margin-top: 1em;
 }
 
 .post-list {
@@ -230,13 +231,22 @@
 .masthead-content {
   display: flex;
   flex-direction: column;
-  margin: 0.75em;
-  font-weight: lighter;
+  margin: 0.5em;
   //justify-content: space-between;
 }
 
-.masthead-text {
+.masthead-content-title {
+  font-weight: lighter;
   align-self: center;
+  max-width: 40%;
+  text-align: center;
+}
+
+.masthead-content-text {
+  align-self: center;
+  margin: 0.75em;
+  max-width: 60%;
+  text-align: center;
 }
 
 .masthead-profile-pic {
