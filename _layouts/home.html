@@ -8,15 +8,17 @@ layout: default
   {%- endif -%}
 
   {{ content }}
-  <div class="about-container">
-    <div class="about-content">
-      <h1 class="about-title">About me</h1>
-      <div class="about-text">
-        MS in Computer Science and things
+  <div class="masthead-container">
+    <img class="masthead-profile-pic" src="/assets/profile.jpg" alt="Shai Bianchi">
+    <div class="masthead-content">
+      <h1 class="masthead-title">Shai Bianchi</h1>
+      <div class="masthead-text">
+        MS in Compsci, freelance dev and entrepreneur
       </div>
     </div>
-    <img class="about-profile-pic" src="/assets/profile.jpg" alt="Shai Bianchi">
   </div>
+
+  <hr style="color: #bdbdbd; margin: 1em;"/>
 
   {%- if site.posts.size > 0 -%}
     <h2 class="post-list-heading">{{ page.list_title | default: "Articles" }}</h2>

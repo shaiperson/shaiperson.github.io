@@ -1,12 +1,15 @@
 ---
 layout: post
-title: "ML Ops: A Fictional Case Study | Chapter I"
+title: "ML Ops: A Fictional Case Study - Chapter I"
 date: 2021-12-04 12:14:00 -0300
-categories: technology
+tags:
+  - ml-ops
+  - tech
 ---
-## The case
 
-Today I'd like to walk you through how ML Ops, and Palanca's ML Ops solutions in particular, might be of great assistance to an engineering team looking to apply ML to solve a problem.
+Today I'd like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.
+
+## The case
 
 So, meet Riley, an engineer at _Nicr_. Nicr is a small startup developing a new model of interaction in social networks. Of course, I just made both Riley and nicr up completely. But bear with me; it will be worth it. Plus, you might just end up with an inspiring idea for a brand new social network after reading this article! That can't be too bad now, can it?
 
@@ -32,7 +35,7 @@ Soon thereafter, having gone through [Hugging Face's great quick tour](https://h
 
 So far so good.
 
-[note futuro challenge de Nicr podría ser deployar modelo a celu si por ejemplo empiezan a soportar feedback en vivo con cada palabra que se tipea -> considerar si Palanca ofrece edge deployment tipo OctoML].
+<!--[note futuro challenge de Nicr podría ser deployar modelo a celu si por ejemplo empiezan a soportar feedback en vivo con cada palabra que se tipea -> considerar si Palanca ofrece edge deployment tipo OctoML].-->
 
 ### The problem
 
@@ -49,7 +52,7 @@ Broad strokes: if a model is outdated, then an update is in order. A few questio
 1. *How might we train our model on our own data?*
 2. *How might we validate the new model is better than the old one?*
 
-Having been in charge of shipping the nice-a-meter initially, Riley takes on this task. Digging back into search engines Hugging Face's Transformers docs, she learns that their model can be fine-tuned with custom datasets, and that once such a dataset is ready it could also be used to validate the new model's performance by running it on train/test splits or cross validation. In need of a dataset [note dataset feature], Riley mines the logs for samples that include interesting cases of mis-classification <!--[note "no siempre va a ser tan fácil" e.g mucha data o imágenes]--> to be manually supervised, ~~<!--[note ordering by prob]-->~~ and tagging work is divided among the team ~~<!--[note "no siempre se va a poder hacer", dividir la data entre muchos tampoco es fácil, le quita mucho tiempo a todos]-->~~.
+Having been in charge of shipping the nice-a-meter initially, Riley takes on this task. Digging back into search engines Hugging Face's Transformers docs, she learns that their model can be fine-tuned with custom datasets, and that once such a dataset is ready it could also be used to validate the new model's performance by running it on train/test splits or cross validation. In need of a dataset <!--[note dataset feature]-->, Riley mines the logs for samples that include interesting cases of mis-classification <!--[note "no siempre va a ser tan fácil" e.g mucha data o imágenes]--> to be manually supervised, <!--[note ordering by prob]--> and tagging work is divided among the team <!--[note "no siempre se va a poder hacer", dividir la data entre muchos tampoco es fácil, le quita mucho tiempo a todos]-->.
 
 As for the fine-tuning code, it becomes clear to Riley that this will not be as breezy as setting up the out-of-the-box model was; a decent amount more of research and trial-and-error is required. But, before long, her fine-tuning code is ready to go. With the dataset all cooked up, a new model is trained and to encouraging results: running some metrics on the test split using the old model and the new one shows a significant improvement, validating the team's suspicions and their efforts towards a fix. The new model is deployed in much the same way that the first one was, with Riley manually uploading it to a server's disk, creating a new image and rolling it out using her cloud computing service's general-purpose deployment functionalities.
 
@@ -69,19 +72,19 @@ So yes, Machine Learning is probably the best solution for spam classification. 
 
 It couldn't be any clearer to Riley that a better solution is needed.
 
-## Enter Palanca
+## Enter ML Ops
 
 Let's take a step back and have a look at the bigger picture. Riley and Nicr's fictional case makes the following point: things get really messy as the use of Machine Learning is extended in application and in time within an organization. Scaling ML models, keeping training data up-to-date and ensuring models are in tip-top shape is hard, and becomes harder as the number of models increase and the kinds of problems they're applied to diversifies.
 
 That's where ML Ops, or Machine Learning Operations, come in. Think about it this way: nowadays, you wouldn't dream of scaling a software development effort without practicing proper DevOps. Just as with DevOps for development, a means of standardizing processes and incorporating reliable and flexible automation is the key to success in scaling with Machine Learning.
 
-At Palanca, we're committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we're also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.  
+## _Palanca_ and the Next Chapter
+
+With this observation in mind, the idea for [_Palanca_](https://www.gopalanca.com/) was born. At Palanca, we're committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we're also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.  
 
 Bringing our prior experience in the field to the table and levaraging the latest tools and infrastructure technology, whether by custom-made solutions or through a powerful dashboard, we're eager to help businesses maximize their ML potential by facing the kinds of challenges exemplified here, and more, successfully.
 
-## In the Next Chapter
-
-As is probably clear by now, we're pretty confident we'd have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.
+So, as is probably clear by now, we're pretty confident we'd have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.
 
 In a following article, we'll take a good look at how this might happen. We'll present ML Ops practices and some of the most exciting features of our work-in-progress tool by examining in detail how Riley and her team might have levaraged them to great advantage.
 

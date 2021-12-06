@@ -186,6 +186,7 @@
 
 .post-list-heading {
   @include relative-font-size(1.75);
+  color: #343434;
 }
 
 .post-list {
@@ -207,31 +208,41 @@
   @include relative-font-size(1.5);
 }
 
-.about-container {
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 3em;
-  justify-content: space-between;
-}
-
-.about-title {
-  //font-size: 2.5em;
-  //font-weight: bolder;
-}
-
-.about-content {
+.masthead-container {
   display: flex;
   flex-direction: column;
+  //margin-bottom: 3em;
   //justify-content: space-between;
 }
 
-.about-text {
-
+.masthead-title {
+  //font-size: 2.5em;
+  //font-weight: bolder;
+  align-self: center;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 54px;
+  color: #3f3f3f;
+  margin-bottom: 0;
+  //letter-spacing: -0.5px;
 }
 
-.about-profile-pic {
+.masthead-content {
+  display: flex;
+  flex-direction: column;
+  margin: 0.75em;
+  font-weight: lighter;
+  //justify-content: space-between;
+}
+
+.masthead-text {
+  align-self: center;
+}
+
+.masthead-profile-pic {
+  align-self: center;
   border-radius: 100%;
-  width: 35%;
+  width: 25%;
 }
 
 .contact-info {
