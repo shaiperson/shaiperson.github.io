@@ -49,8 +49,9 @@ As Nicr's platform grew and its community became tighter, so did the language em
 
 Broad strokes: if a model is outdated, then an update is in order. A few questions therefore immediately come to mind
 
-1. *How might we train our model on our own data?*
-2. *How might we validate the new model is better than the old one?*
+- *How might we train our model on our own data?*
+
+- *How might we validate the new model is better than the old one?*
 
 Having been in charge of shipping the nice-a-meter initially, Riley takes on this task. Digging back into search engines Hugging Face's Transformers docs, she learns that their model can be fine-tuned with custom datasets, and that once such a dataset is ready it could also be used to validate the new model's performance by running it on train/test splits or cross validation. In need of a dataset <!--[note dataset feature]-->, Riley mines the logs for samples that include interesting cases of mis-classification <!--[note "no siempre va a ser tan fácil" e.g mucha data o imágenes]--> to be manually supervised, <!--[note ordering by prob]--> and tagging work is divided among the team <!--[note "no siempre se va a poder hacer", dividir la data entre muchos tampoco es fácil, le quita mucho tiempo a todos]-->.
 
@@ -60,7 +61,7 @@ As for the fine-tuning code, it becomes clear to Riley that this will not be as 
 
 Nevertheless, a third and important question had also come to Riley's mind when she understood what had happened:
 
-3. *What about the next time?* 
+- *What about the next time?* 
 
 Just as the nature of data in the wild had changed enough at that point to cause drift, so it is bound to do again. Would they just wait for user reports to pour in again and repeat the exact same process? They'd have to manually prepare a dataset, spend time dividing and managing supervision work, manually re-train and manually re-deploy. Monitoring will be left again to an indirect means such as mining subsequent user-submitted reports. Whenever this problem arises again, they'd have to scramble to figure out what's causing the new drift before even having a chance at working on fixing it. Needless to say, all the while they'd be allowing a degradation of service to take place that they might not be able to afford, and crucial work hours would be allocated away from other important bugs and features.
 
