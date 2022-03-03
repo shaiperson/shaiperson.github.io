@@ -118,16 +118,14 @@ Now, if we were to add a new algorithm to this improved setup and we wanted to d
 
 In the following article in the series, we implement the initial design using Python. That implementation will then serve as a basis for applying the complete pattern in the third and final part.
 
-And to address your main concern: yes, there _is_ an actual meme classifier in the next article for you to mess around with.
+And yes, I know what you're thinking: it _would_ be cool for there to actually be a meme classifier in the next article.
 
-<br />
+I'm happy to say your hopes will be realized.
 
-<img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 30%;"/>
-
-<br />
+<img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
 
 ```
 controller         | INFO :: Received message, calling runner
 meme-classifier    | INFO :: Running classifier on URL
-controller         | INFO :: Received result from sidecar: {'label': 'math_lady', 'score': 1.0}
+controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 ```

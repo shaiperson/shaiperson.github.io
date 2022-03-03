@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part I" />
 <script type="application/ld+json">
-{"dateModified":"2022-02-15T12:55:00-03:00","datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/02/15/plug-play-worker-pattern-1.html"},"url":"/2022/02/15/plug-play-worker-pattern-1.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part I","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/02/15/plug-play-worker-pattern-1.html"},"url":"/2022/02/15/plug-play-worker-pattern-1.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part I","dateModified":"2022-02-15T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -164,17 +164,15 @@
 
 <p>In the following article in the series, we implement the initial design using Python. That implementation will then serve as a basis for applying the complete pattern in the third and final part.</p>
 
-<p>And to address your main concern: yes, there <em>is</em> an actual meme classifier in the next article for you to mess around with.</p>
+<p>And yes, I know what you’re thinking: it <em>would</em> be cool for there to actually be a meme classifier in the next article.</p>
 
-<p><br /></p>
+<p>I’m happy to say your hopes will be realized.</p>
 
-<p><img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" /></p>
-
-<p><br /></p>
+<p><img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 40%;" /></p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller         | INFO :: Received message, calling runner
 meme-classifier    | INFO :: Running classifier on URL
-controller         | INFO :: Received result from sidecar: {'label': 'math_lady', 'score': 1.0}
+controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 </code></pre></div></div>
 
   </div><a class="u-url" href="/2022/02/15/plug-play-worker-pattern-1.html" hidden></a>
