@@ -89,7 +89,7 @@ Sounds too good to be true, right? So, what's the catch?
 
 The idea for the pattern is simple, and natural if we look at through a microservice lens: if we need dynamic discovery of runners and algorithms, then let's add a component for “dynamic runner discovery”. This Runner Discovery component will be a component that holds, after initialization, an in-RAM mapping of every algorithm supported in that worker environment to the port of the container that can run it. Provided every algorithm can only run in one container, which is a sensible precondition, this mapping is all the information the controller will need to execute its task. The controller will request this mapping from the discovery component and automatically know what port it can find each algorithm on. So there's a bit of initialization code to add to the controller here that will request the mappings from this new component.
 
-The remaining question is: how does Runner Discovery get its hands on such a mapping? Well, there's another bit of initialization code to be added, this time to the runner containers. Upon initialization, each runner would have to come up with a list of the algorithms it supports, the port it is running on and send all of this info to Runner Discovery. This demands that the containers are able to do some discovery of their own to get their list of algorithms dynamically. Right off the bat, this sounds like it should be possible with any language that supports some sort of reflection that would allow one to discover implemented functions or modules in a container's application code. As noted in the introduction, each language would require us to think of a way to do this reasonably; but since we're sticking to an at-least-Python constraint here, we'll be perfectly good to go in this regard.
+The remaining question is: how does Runner Discovery get its hands on such a mapping? Well, there's another bit of initialization code to be added, this time to the runner containers. Upon initialization, each runner would have to come up with a list of the algorithms it supports, the port it is running on and send all of this info to Runner Discovery. This demands that the containers are able to do some discovery of their own to get their list of algorithms dynamically. Right off the bat, this sounds like it should be possible with any language that supports some sort of reflection that would allow one to discover implemented functions or modules in a container's application code. As noted in the introduction, each language would require us to think of a way to do this reasonably; but since we're sticking to an at-least-Python constraint here, we'll be perfectly good to go in this regard once we establish a convention for exposing the algorithm-running Python functions to the auxiliary server.
 
 This is how applying these ideas to our setup would look like:
 
@@ -111,3 +111,23 @@ So, herein lies the catch: we add a discovery component to our setup and a bit o
 I submit, however, that this is a small price to pay, and it's the offloading of mapping responsibility to this new component that gives us the discussed benefits of dynamic algorithm mapping. It's true that those bits of added code need to be implemented and maintained, but they're simple to implement and can be simple enough to maintain as well. First and foremost, they remain constant as a function of algorithm addition or removal, as they must be algorithm-agnostic by their very nature of providing dynamic mapping of algorithms. Furthermore, the controller's bit which queries Runner Discovery can be added to and versioned with the very same controller code (thereby yielding "Controller*"), which means it lives in and affects that single source project alone.
 
 If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment's repertoir of algorithms. **Spoiler alert**: it can also be made a lot easier by just coding both the "S” and "D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we'll do in Part III.
+
+Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we'd just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we'd be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running functions comply with the same convention, we'd just have to build the new container with the "D" and "S" components, deploy it, and done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it's ready to play.
+
+## What's Next
+
+In the following article in the series, we implement the initial design using Python. That will serve as a basis for implementing the complete pattern in the third and final part.
+
+And yes, I know what you're thinking. Your hopes will be realized: there _is_ an actual meme classifier in the next article for you to mess around with.
+
+<br />
+
+<img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 30%;"/>
+
+<br />
+
+```
+controller         | INFO :: Received message, calling runner
+meme-classifier    | INFO :: Running classifier on URL
+controller         | INFO :: Received result from sidecar: {'label': 'math_lady', 'score': 1.0}
+```
