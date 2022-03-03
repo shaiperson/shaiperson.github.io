@@ -116,9 +116,9 @@ Now, if we were to add a new algorithm to this improved setup and we wanted to d
 
 ## What's Next
 
-In the following article in the series, we implement the initial design using Python. That will serve as a basis for implementing the complete pattern in the third and final part.
+In the following article in the series, we implement the initial design using Python. That implementation will then serve as a basis for applying the complete pattern in the third and final part.
 
-And yes, I know what you're thinking. Your hopes will be realized: there _is_ an actual meme classifier in the next article for you to mess around with.
+And to address your main concern: yes, there _is_ an actual meme classifier in the next article for you to mess around with.
 
 <br />
 
