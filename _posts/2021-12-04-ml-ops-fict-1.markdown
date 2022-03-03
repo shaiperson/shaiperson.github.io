@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "ML Ops: A Fictional Case Study - Chapter I"
+title: "ML Ops: A Fictional Case Study"
 date: 2021-12-04 12:14:00 -0300
 tags:
   - ml-ops
@@ -11,7 +11,7 @@ Today I'd like to walk you through how the incorporation of ML Ops practices mig
 
 ## The case
 
-So, meet Riley, an engineer at _Nicr_. Nicr is a small startup developing a new model of interaction in social networks. Of course, I just made both Riley and nicr up completely. But bear with me; it will be worth it. Plus, you might just end up with an inspiring idea for a brand new social network after reading this article! That can't be too bad now, can it?
+So, meet Riley, an engineer at _Nicr_. Nicr (as in "nicer", but hipper) is a small startup developing a new model of interaction in social networks. Of course, I just made both Riley and nicr up completely. But bear with me; it will be worth it. Plus, you might just end up with an inspiring idea for a brand new social network after reading this article! That can't be too bad now, can it?
 
 OK, don't quote me on that last part.
 
@@ -79,15 +79,15 @@ Let's take a step back and have a look at the bigger picture. Riley and Nicr's f
 
 That's where ML Ops, or Machine Learning Operations, come in. Think about it this way: nowadays, you wouldn't dream of scaling a software development effort without practicing proper DevOps. Just as with DevOps for development, a means of standardizing processes and incorporating reliable and flexible automation is the key to success in scaling with Machine Learning.
 
-## _Palanca_ and the Next Chapter
+<!--[## _Palanca_ and the Next Chapter]-->
 
-With this observation in mind, the idea for [_Palanca_](https://www.gopalanca.com/) was born. At Palanca, we're committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we're also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.  
+<!--[With this observation in mind, the idea for [_Palanca_](https://www.gopalanca.com/) was born. At Palanca, we're committed to providing ML Ops solutions for business looking to do exactly that. As well as offering tailored solutions for clients, we're also hard at work in crafting a powerful, single-dashboard tool that strives to concentrate everything a team might need to step up their ML Ops immediately by integrating it into their workflow.]-->  
 
-Bringing our prior experience in the field to the table and levaraging the latest tools and infrastructure technology, whether by custom-made solutions or through a powerful dashboard, we're eager to help businesses maximize their ML potential by facing the kinds of challenges exemplified here, and more, successfully.
+<!--[Bringing our prior experience in the field to the table and levaraging the latest tools and infrastructure technology, whether by custom-made solutions or through a powerful dashboard, we're eager to help businesses maximize their ML potential by facing the kinds of challenges exemplified here, and more, successfully.]-->
 
-So, as is probably clear by now, we're pretty confident we'd have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.
+<!--[So, as is probably clear by now, we're pretty confident we'd have been of great help to Riley and the Nicr team. Given the issues they encountered in their application of ML to their product, they would have benefited greatly from bringing ML Ops practices into their development process.]-->
 
-In a following article, we'll take a good look at how this might happen. We'll present ML Ops practices and some of the most exciting features of our work-in-progress tool by examining in detail how Riley and her team might have levaraged them to great advantage.
+<!--[In a following article, we'll take a good look at how this might happen. We'll present ML Ops practices and some of the most exciting features of our work-in-progress tool by examining in detail how Riley and her team might have levaraged them to great advantage.]-->
 
 <!--[Entonces, "let's step back". Riley necesita abstracciones, procesos, automatización etc -> Palanca ofrece eso -> Veamos como Riley podría aprovechar nuestros productos -> Riley entra acá, toca acá, sube allá, monitorea acullá. [note screenshots]]-->
 <!--[Ahora que cuentan con eso, en Nicr de repente pueden empezar a aplicar ML para resolver cosas mucho más interesantes y complejas (e.g predicción de up-votes/down-votes en función del sentimiento del contenido, predicción de churn en base a up-votes/down-votes o sentimiento de comentarios en sus posts. Noter que estos algoritmos tendrían inputs "compuetsos" and not just texto o imagen y nosotros ofreceríamos funcionalidad para eso).]-->
