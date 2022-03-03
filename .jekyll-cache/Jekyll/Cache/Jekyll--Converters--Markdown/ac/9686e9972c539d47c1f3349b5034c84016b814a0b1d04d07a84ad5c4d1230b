@@ -1,4 +1,4 @@
-I"8G<hr />
+I"’G<hr />
 <p><strong>Note</strong></p>
 
 <p>This is <strong>Part I</strong> of a three-part series.</p>
@@ -125,4 +125,6 @@
 meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 </code></pre></div></div>
+
+<p>Click <a href="/2022/03/02/plug-play-worker-pattern-2.html">here</a> for Part II.</p>
 :ET

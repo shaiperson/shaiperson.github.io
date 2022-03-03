@@ -129,3 +129,5 @@ controller         | INFO :: Received message, calling runner
 meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 ```
+
+Click [here](/2022/03/02/plug-play-worker-pattern-2.html) for Part II.
