@@ -95,7 +95,7 @@ This is how applying these ideas to our setup would look like:
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled%202.png" style="display: block; margin-left: auto; margin-right: auto; width: 120%;"/>
 
-Note too that this pattern constrains the initialization order of components. Runner Discovery has to start first so that the runners can then register with it. In turn, the controller can only start ones all runners are done registering. In summary:
+Note too that this pattern constrains the initialization order of components. Runner Discovery has to start first so that the runners can then register with it. In turn, the controller can only start once all runners are done registering. In summary:
 
 1. Runner Discovery initializes.
 2. Runners initialize, POST list of supported algorithms and port to Runner Discovery.
@@ -106,7 +106,7 @@ For reference, this what the general case might look like:
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled%203.png" style="display: block; margin-left: auto; margin-right: auto; width: 50%;"/>
 
-So, herein lies the catch: we add a discovery component to our setup and a bit of code to the controller and runners to interact with the new discovery component. The modified controller is represented as *Controller** in the diagram, and the "D” in the runners denotes the new discovery-related code. This is to represent the fact that we'd want to single-source that functionality and package it in each runner build, much the same way we'd do with the auxiliary server code.
+So, herein lies the catch: we add a discovery component to our setup and a bit of code to the controller and runners to interact with the new discovery component. The modified controller is represented as "Controller*" in the diagram, and the "D” in the runners denotes the new discovery-related code. This is to represent the fact that we'd want to single-source that functionality and package it in each runner build, much the same way we'd do with the auxiliary server code.
 
 I submit, however, that this is a small price to pay, and it's the offloading of mapping responsibility to this new component that gives us the discussed benefits of dynamic algorithm mapping. It's true that those bits of added code need to be implemented and maintained, but they're simple to implement and can be simple enough to maintain as well. First and foremost, they remain constant as a function of algorithm addition or removal, as they must be algorithm-agnostic by their very nature of providing dynamic mapping of algorithms. Furthermore, the controller's bit which queries Runner Discovery can be added to and versioned with the very same controller code (thereby yielding *Controller**), which means it lives in and affects that single source project alone.
 
