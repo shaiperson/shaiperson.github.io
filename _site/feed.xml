@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-02T22:48:18-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part I</title><link href="/2022/02/15/plug-play-worker-pattern-1.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part I" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>/2022/02/15/plug-play-worker-pattern-1</id><content type="html" xml:base="/2022/02/15/plug-play-worker-pattern-1.html">&lt;hr /&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-02T23:06:14-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part I</title><link href="/2022/02/15/plug-play-worker-pattern-1.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part I" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>/2022/02/15/plug-play-worker-pattern-1</id><content type="html" xml:base="/2022/02/15/plug-play-worker-pattern-1.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part I&lt;/strong&gt; of a three-part series.&lt;/p&gt;
@@ -48,7 +48,7 @@
 
 &lt;p&gt;We can use a local network for our componentes to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the “S” inside the runner component to denote the auxiliary server application it’s packaged with.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/Plug%20&amp;amp;%20Pla%20ae35c/Untitled.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 30%;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 30%;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;With both the controller and runner components containerized and communicating locally over HTTP, this design is sufficient to satisfy our requirements so far.&lt;/p&gt;
 
@@ -68,7 +68,7 @@
 
 &lt;p&gt;So, let’s just assume that our OCR lives in a new project, coded and versiones separately, and we add some appropriate build logic so we can deploy it in good containerly fashion. The “easy” and naïve way to now add this new runner container to our worker would be to just throw in there and hook it up to the controller via HTTP on a new port.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/Plug%20&amp;amp;%20Pla%20ae35c/Untitled%201.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 90%;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled%201.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 90%;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;This would require we set up our new container with an auxiliary HTTP server with an endpoint for the controller to request OCR, similarly to how we did before with our meme classifier. The best way to do this would probably be to code up a single server application that knows how to listen to requests for both algorithms and to deploy it with both runner containers. It would also require we have the controller know port Y as well as X, and associate meme classification with the latter and OCR with the former.&lt;/p&gt;
 
@@ -88,7 +88,7 @@
 
 &lt;p&gt;This is how applying these ideas to our setup would look like:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/Plug%20&amp;amp;%20Pla%20ae35c/Untitled%202.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 120%;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled%202.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 120%;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Note too that this pattern constrains the initialization order of components. Runner Discovery has to start first so that the runners can then register with it. In turn, the controller can only start ones all runners are done registering. In summary:&lt;/p&gt;
 
@@ -101,7 +101,7 @@
 
 &lt;p&gt;For reference, this what the general case might look like:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/Plug%20&amp;amp;%20Pla%20ae35c/Untitled%203.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 55%;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled%203.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 50%;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;So, herein lies the catch: we add a discovery component to our setup and a bit of code to the controller and runners to interact with the new discovery component. The modified controller is represented as *Controller** in the diagram, and the “D” in the runners denotes the new discovery-related code. This is to represent the fact that we’d want to single-source that functionality and package it in each runner build, much the same way we’d do with the auxiliary server code.&lt;/p&gt;
 
@@ -203,16 +203,4 @@
 &lt;!--[Encontrar la manera de mencionar otros features que se desprenden de tener algo así como el poder trackear historial de modelos (para e.g eventualmente decidirse por cambio de arquitectura de red), versionado y rollbacks, sandboxing para experimentar etc, cálculo de métricas subseleccionando features de la data.]--&gt;
 &lt;!--[Sugerir al final somehow que el producto no está terminado y veríamos qué necesidades tiene cada cliente?]--&gt;
 &lt;!--[Que quede claro que el punto es que las necesidades específicas o idiosincráticas no tardan en aparecer ni tampoco lo hace la multiplicidad de modelos.]--&gt;
-&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Today I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.</summary></entry><entry><title type="html">Palanca’s Mission Statement</title><link href="/2021/11/16/palanca-mission-statement.html" rel="alternate" type="text/html" title="Palanca’s Mission Statement" /><published>2021-11-16T14:13:00-03:00</published><updated>2021-11-16T14:13:00-03:00</updated><id>/2021/11/16/palanca-mission-statement</id><content type="html" xml:base="/2021/11/16/palanca-mission-statement.html">&lt;h1 id=&quot;so-whats-ml-ops-all-about&quot;&gt;So What’s ML Ops All About?&lt;/h1&gt;
-
-&lt;p&gt;Nowadays, Machine Learning is ubiqutous across all manner of industries and applications. Accordingly, implementing Machine Learning solutions has become increasingly easy, with an ever-growing ecosystem of tools that facilitate its powers to software development teams who no longer require highly specialized hires in order to take advantage of it. If a software developer needs a Machine Learning algorithm to solve a problem or deliver a feature, they can count on a wide variety of free and effective tools to get them all the way up to a decently accurate and performant model.&lt;/p&gt;
-
-&lt;p&gt;However, a model then needs to be deployed and be made accesible for use in production. Deployment in itself is challenging enough with issues of language, compilation, hardware and cost management to consider, but then the model also has to be monitored for drift, re-trained, re-tuned and re-deployed. As a product grows and evolves, this cycle needs to be repeated in a timely fashion to avoid degradation in quality. Further, while all of this may be tractable at a small scale by handling it manually and in an unstructured way, what happens when a second model is required? And a third? To make things worse, what if subsequent models also diverge in the kind of data they use for training, hardware requirements or software dependencies?&lt;/p&gt;
-
-&lt;p&gt;After focusing on the science and algorithms in themselves, the software industry is now increasingly concerned with these kinds of problems; it is facing the &lt;em&gt;operationalization&lt;/em&gt; of Machine Learning solutions. This is where the field of &lt;em&gt;Machine Learning Operations&lt;/em&gt;, or &lt;em&gt;ML Ops&lt;/em&gt;, comes into play. Just as things have unfolded industry-wise, so they would naturally evolve for a development team working out a concrete problem. Once an ML solution is crafted and integrated into a system, the need for ML Ops will not be far behind in making itself evident.&lt;/p&gt;
-
-&lt;h1 id=&quot;enter-palanca&quot;&gt;Enter &lt;em&gt;Palanca&lt;/em&gt;&lt;/h1&gt;
-
-&lt;p&gt;At &lt;a href=&quot;https://www.gopalanca.com/&quot;&gt;&lt;em&gt;Palanca&lt;/em&gt;&lt;/a&gt;, we have set out on a journey to help teams tackle this very challenge. We believe strongly that any ML Ops solution worth considering should make working with Machine Learning smooth, productive and enjoyable. With our experience in ML in both academic and industrial settings and having grappled with many of the issues this usually entails, we’ve become passionate about creating tools that will deliver data scientists and engineers the opportunity to make their ML operations a delight.&lt;/p&gt;
-
-&lt;p&gt;Consider reading some more about what we do in other &lt;em&gt;ml-ops&lt;/em&gt; or &lt;em&gt;palanca&lt;/em&gt; -tagged articles, check out our website at &lt;a href=&quot;https://www.gopalanca.com/&quot;&gt;https://www.gopalanca.com/&lt;/a&gt; and feel free to get in touch with any comments or questions at &lt;a href=&quot;mailto:contact@gopalanca.com&quot;&gt;contact@gopalanca.com&lt;/a&gt; or via my personal contact info.&lt;/p&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><category term="palanca" /><summary type="html">So What’s ML Ops All About?</summary></entry></feed>
+&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Today I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.</summary></entry></feed>

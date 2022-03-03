@@ -71,7 +71,7 @@ Looking to add the new OCR algorithm to the same worker setup, there are a numbe
 
 Say we are now delivered the new OCR code for us to deploy. At this stage, if we were to deploy the OCR code into our single, preexisting runner container, our job would be simple enough: have the auxiliary server application know how to invoke the new code similarly to how it's been doing the meme classifier, re-build, re-deploy and we're done. The case where we want to deploy it into a new container, however, is a bit more interesting and more readily reveals the pitfalls in our initial design.
 
-So, let's just assume that our OCR lives in a new project, coded and versiones separately, and we add some appropriate build logic so we can deploy it in good containerly fashion. The "easy" and naïve way to now add this new runner container to our worker would be to just throw in there and hook it up to the controller via HTTP on a new port.
+So, let's just assume that our OCR lives in a new project, coded and versioned separately, and we add some appropriate build logic so we can deploy it in good containerly fashion. The "easy" and naïve way to now add this new runner container to our worker would be to just throw in there and hook it up to the controller via HTTP on a new port.
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled%201.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;"/>
 

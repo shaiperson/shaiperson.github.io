@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part I" />
 <script type="application/ld+json">
-{"url":"/2022/02/15/plug-play-worker-pattern-1.html","headline":"Plug &amp; Play Worker Pattern - Part I","dateModified":"2022-02-15T12:55:00-03:00","datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/02/15/plug-play-worker-pattern-1.html"},"description":"Note","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/02/15/plug-play-worker-pattern-1.html"},"url":"/2022/02/15/plug-play-worker-pattern-1.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part I","dateModified":"2022-02-15T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -97,7 +97,7 @@
 
 <p>We can use a local network for our componentes to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the “S” inside the runner component to denote the auxiliary server application it’s packaged with.</p>
 
-<p><img src="/assets/Plug%20&amp;%20Pla%20ae35c/Untitled.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" /></p>
+<p><img src="/assets/plug-play-worker-pattern-part-1/Untitled.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" /></p>
 
 <p>With both the controller and runner components containerized and communicating locally over HTTP, this design is sufficient to satisfy our requirements so far.</p>
 
@@ -117,7 +117,7 @@
 
 <p>So, let’s just assume that our OCR lives in a new project, coded and versiones separately, and we add some appropriate build logic so we can deploy it in good containerly fashion. The “easy” and naïve way to now add this new runner container to our worker would be to just throw in there and hook it up to the controller via HTTP on a new port.</p>
 
-<p><img src="/assets/Plug%20&amp;%20Pla%20ae35c/Untitled%201.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+<p><img src="/assets/plug-play-worker-pattern-part-1/Untitled%201.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
 
 <p>This would require we set up our new container with an auxiliary HTTP server with an endpoint for the controller to request OCR, similarly to how we did before with our meme classifier. The best way to do this would probably be to code up a single server application that knows how to listen to requests for both algorithms and to deploy it with both runner containers. It would also require we have the controller know port Y as well as X, and associate meme classification with the latter and OCR with the former.</p>
 
@@ -137,7 +137,7 @@
 
 <p>This is how applying these ideas to our setup would look like:</p>
 
-<p><img src="/assets/Plug%20&amp;%20Pla%20ae35c/Untitled%202.png" style="display: block; margin-left: auto; margin-right: auto; width: 120%;" /></p>
+<p><img src="/assets/plug-play-worker-pattern-part-1/Untitled%202.png" style="display: block; margin-left: auto; margin-right: auto; width: 120%;" /></p>
 
 <p>Note too that this pattern constrains the initialization order of components. Runner Discovery has to start first so that the runners can then register with it. In turn, the controller can only start ones all runners are done registering. In summary:</p>
 
@@ -150,7 +150,7 @@
 
 <p>For reference, this what the general case might look like:</p>
 
-<p><img src="/assets/Plug%20&amp;%20Pla%20ae35c/Untitled%203.png" style="display: block; margin-left: auto; margin-right: auto; width: 55%;" /></p>
+<p><img src="/assets/plug-play-worker-pattern-part-1/Untitled%203.png" style="display: block; margin-left: auto; margin-right: auto; width: 50%;" /></p>
 
 <p>So, herein lies the catch: we add a discovery component to our setup and a bit of code to the controller and runners to interact with the new discovery component. The modified controller is represented as *Controller** in the diagram, and the “D” in the runners denotes the new discovery-related code. This is to represent the fact that we’d want to single-source that functionality and package it in each runner build, much the same way we’d do with the auxiliary server code.</p>
 
