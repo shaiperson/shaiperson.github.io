@@ -257,4 +257,4 @@ Looking good! You can play around some more with it if you like and have some fu
 
 ## What's Next
 
-In Part III of the series, we'll implement the final pattern presented in Part I and test it. We'll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy.
+In Part III of the series, we'll implement the final pattern presented in Part I and test it. We'll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.
