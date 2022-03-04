@@ -33,7 +33,7 @@ In Part II, we'll go through implementing the naïve design. This is useful most
 
 As explained in Part I, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is in branch `initial`. 
 
-The code for all componentes is placed in a single repository. Looking at the repo, you'll find a directory for each component with its source files, Dockerfile and a `build.sh ` script. The `worker` and `producer` directories are there to assist in running and testing everything locally.
+The code for all components is placed in a single repository. Looking at the repo, you'll find a directory for each component with its source files, Dockerfile and a `build.sh ` script. The `worker` and `producer` directories are there to assist in running and testing everything locally.
 
 ## Implementation
 
@@ -165,7 +165,7 @@ Notice the error management. As we saw above, the controller looks out for an er
 
 ### Dockerization, Compose File
 
-I tend to favor containerizing all componentes that go into a worker setup as this lends itself very well to deployment using orchestration tools such as AWS ECS or Kubernetes. It also helps in minimizing differences between development, staging and production environments. We'll use Docker Compose to run our setup locally.
+I tend to favor containerizing all components that go into a worker setup as this lends itself very well to deployment using orchestration tools such as AWS ECS or Kubernetes. It also helps in minimizing differences between development, staging and production environments. We'll use Docker Compose to run our setup locally.
 
 #### Controller Dockerfile
 

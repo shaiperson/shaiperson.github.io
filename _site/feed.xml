@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-03T23:50:09-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part II</title><link href="/2022/03/02/plug-play-worker-pattern-2.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part II" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>/2022/03/02/plug-play-worker-pattern-2</id><content type="html" xml:base="/2022/03/02/plug-play-worker-pattern-2.html">&lt;hr /&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-03T23:55:06-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part II</title><link href="/2022/03/02/plug-play-worker-pattern-2.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part II" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>/2022/03/02/plug-play-worker-pattern-2</id><content type="html" xml:base="/2022/03/02/plug-play-worker-pattern-2.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part II&lt;/strong&gt; of a three-part series.&lt;/p&gt;
@@ -29,7 +29,7 @@
 
 &lt;p&gt;As explained in Part I, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example &lt;a href=&quot;https://github.com/shaiperson/worker-pattern-article&quot;&gt;this GitHub repo&lt;/a&gt;. Code for the initial design presented here is in branch &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initial&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;The code for all componentes is placed in a single repository. Looking at the repo, you’ll find a directory for each component with its source files, Dockerfile and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;build.sh &lt;/code&gt; script. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;worker&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;producer&lt;/code&gt; directories are there to assist in running and testing everything locally.&lt;/p&gt;
+&lt;p&gt;The code for all components is placed in a single repository. Looking at the repo, you’ll find a directory for each component with its source files, Dockerfile and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;build.sh &lt;/code&gt; script. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;worker&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;producer&lt;/code&gt; directories are there to assist in running and testing everything locally.&lt;/p&gt;
 
 &lt;h2 id=&quot;implementation&quot;&gt;Implementation&lt;/h2&gt;
 
@@ -155,7 +155,7 @@
 
 &lt;h3 id=&quot;dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/h3&gt;
 
-&lt;p&gt;I tend to favor containerizing all componentes that go into a worker setup as this lends itself very well to deployment using orchestration tools such as AWS ECS or Kubernetes. It also helps in minimizing differences between development, staging and production environments. We’ll use Docker Compose to run our setup locally.&lt;/p&gt;
+&lt;p&gt;I tend to favor containerizing all components that go into a worker setup as this lends itself very well to deployment using orchestration tools such as AWS ECS or Kubernetes. It also helps in minimizing differences between development, staging and production environments. We’ll use Docker Compose to run our setup locally.&lt;/p&gt;
 
 &lt;h4 id=&quot;controller-dockerfile&quot;&gt;Controller Dockerfile&lt;/h4&gt;
 
@@ -285,11 +285,11 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;h2 id=&quot;basic-worker&quot;&gt;Basic worker&lt;/h2&gt;
 
-&lt;p&gt;A common practice is to deploy algorithms and worker code in general into container environments that can be replicated and scaled up and down to fit demand. I tend to favor containerizing all componentes that go into a worker setup as this lends itself very well to using orchestration tools such as AWS ECS or Kubernetes. It also helps minimize differences between development, staging and production environments.&lt;/p&gt;
+&lt;p&gt;A common practice is to deploy algorithms and worker code in general into container environments that can be replicated and scaled up and down to fit demand. I tend to favor containerizing all components that go into a worker setup as this lends itself very well to using orchestration tools such as AWS ECS or Kubernetes. It also helps minimize differences between development, staging and production environments.&lt;/p&gt;
 
 &lt;p&gt;We’ll create a &lt;em&gt;controller&lt;/em&gt; component responsible for reading messages from the queue and sending results. This component will feed inputs from queued messages to a second &lt;em&gt;runner&lt;/em&gt; component, responsible for running the actual classifier code.&lt;/p&gt;
 
-&lt;p&gt;We can use a local network for our componentes to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the “S” inside the runner component to denote the auxiliary server application it’s packaged with.&lt;/p&gt;
+&lt;p&gt;We can use a local network for our components to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the “S” inside the runner component to denote the auxiliary server application it’s packaged with.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 30%;&quot; /&gt;&lt;/p&gt;
 

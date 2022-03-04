@@ -47,11 +47,11 @@ So, imagine an ML team develops an algorithm. At the same time, our back-end eng
 
 ## Basic worker
 
-A common practice is to deploy algorithms and worker code in general into container environments that can be replicated and scaled up and down to fit demand. I tend to favor containerizing all componentes that go into a worker setup as this lends itself very well to using orchestration tools such as AWS ECS or Kubernetes. It also helps minimize differences between development, staging and production environments.
+A common practice is to deploy algorithms and worker code in general into container environments that can be replicated and scaled up and down to fit demand. I tend to favor containerizing all components that go into a worker setup as this lends itself very well to using orchestration tools such as AWS ECS or Kubernetes. It also helps minimize differences between development, staging and production environments.
 
 We'll create a *controller* component responsible for reading messages from the queue and sending results. This component will feed inputs from queued messages to a second *runner* component, responsible for running the actual classifier code.
 
-We can use a local network for our componentes to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the "S" inside the runner component to denote the auxiliary server application it's packaged with.
+We can use a local network for our components to communicate with each other, which is a good practice encouraged by Docker and by multi-container application tools such as Docker Compose. In our particular case, for the controller/runner communication, a simple client/server pattern over HTTP looks like a natural way to go: as the controller reads messages, it POSTs inputs to the runner and receives algorithm results. The only additional requirement this implies is for the runner to be packaged with an HTTP server in front of it that listens locally for requests by the controller. We use the "S" inside the runner component to denote the auxiliary server application it's packaged with.
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;"/>
 
