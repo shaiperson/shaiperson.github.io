@@ -120,7 +120,7 @@ In the following article in the series, we implement the initial design using Py
 
 And yes, I know what you're thinking: it _would_ be cool for there to actually be a meme classifier in the next article.
 
-I agree, and there is.
+I agree. And there is one.
 
 <img src="https://memegenerator.net/img/images/300x300/17149542.jpg" style="display: block; margin-left: auto; margin-right: auto; width: 40%;"/>
 
