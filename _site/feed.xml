@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-03T18:13:50-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part II</title><link href="/2022/03/02/plug-play-worker-pattern-2.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part II" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>/2022/03/02/plug-play-worker-pattern-2</id><content type="html" xml:base="/2022/03/02/plug-play-worker-pattern-2.html">&lt;hr /&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-03T23:50:09-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part II</title><link href="/2022/03/02/plug-play-worker-pattern-2.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part II" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>/2022/03/02/plug-play-worker-pattern-2</id><content type="html" xml:base="/2022/03/02/plug-play-worker-pattern-2.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part II&lt;/strong&gt; of a three-part series.&lt;/p&gt;
@@ -321,7 +321,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;p&gt;In looking at this breakdown of disadvantages for our initial approach, we may note that the &lt;em&gt;static&lt;/em&gt; nature of the &lt;strong&gt;algorithm-to-port&lt;/strong&gt; mappings in the controller and the &lt;strong&gt;algorithm-to-code&lt;/strong&gt; mappings in the auxiliary server is at the core of this design’s shortcomings, as this static nature is what produces the need to re-build everything each time we make algorithm-wise updates to our worker environment. With this in mind, our goal becomes clear: to find a way to make &lt;strong&gt;container ports&lt;/strong&gt; and &lt;strong&gt;algorithm code&lt;/strong&gt; &lt;em&gt;dynamically mappable&lt;/em&gt; or &lt;em&gt;discoverable&lt;/em&gt;. If we achieve that, then adding or removing algorithms becomes much simpler automatically: a new algorithm in an existing container requires re-building its image and its image alone; a new algorithm in a new container is discovered by the controller automatically.&lt;/p&gt;
 
-&lt;p&gt;Sounds too good to be true, right? So, what’s the catch?&lt;/p&gt;
+&lt;p&gt;So, how do we do that? What’s the catch?&lt;/p&gt;
 
 &lt;h3 id=&quot;the-pattern&quot;&gt;The pattern&lt;/h3&gt;
 
@@ -352,7 +352,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;p&gt;If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment’s repertoir of algorithms. &lt;strong&gt;Spoiler alert&lt;/strong&gt;: it can also be made a lot easier by just coding both the “S” and “D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we’ll do in Part III.&lt;/p&gt;
 
-&lt;p&gt;Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we’d just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we’d be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running functions comply with the same convention, we’d just have to build the new container with the “D” and “S” components, deploy it, and done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it’s ready to play.&lt;/p&gt;
+&lt;p&gt;Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we’d just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we’d be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running code comply with the same convention, we’d just have to build and deploy the new container with the “D” and “S” code and we’d done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it’s ready to play.&lt;/p&gt;
 
 &lt;h2 id=&quot;whats-next&quot;&gt;What’s Next&lt;/h2&gt;
 
@@ -360,7 +360,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;p&gt;And yes, I know what you’re thinking: it &lt;em&gt;would&lt;/em&gt; be cool for there to actually be a meme classifier in the next article.&lt;/p&gt;
 
-&lt;p&gt;I’m happy to say your hopes will be realized.&lt;/p&gt;
+&lt;p&gt;I agree, and there is.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://memegenerator.net/img/images/300x300/17149542.jpg&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 40%;&quot; /&gt;&lt;/p&gt;
 
