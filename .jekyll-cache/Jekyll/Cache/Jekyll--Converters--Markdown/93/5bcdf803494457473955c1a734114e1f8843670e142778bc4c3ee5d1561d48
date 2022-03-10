@@ -1,0 +1,64 @@
+I"<h2 id="introduction">Introduction</h2>
+
+<p>I’d like to share a “pattern” that emerged in my work deploying ML inference Python code to AWS Lambda. To do this, first allow me to offer three quick observations that will help us tie this pattern together.</p>
+
+<h3 id="on-lambda-and-its-storage-quota">On Lambda and its storage quota</h3>
+<p>AWS Lambda can be a convenient way of deploying production code for many use cases. However, as can expected from such high-level services, it also comes with some limitations. In particular, it has a strict storage space quota: Lambda provides a filesystem on an ephemeral storage space for you to use under <code class="language-plaintext highlighter-rouge">/tmp</code> in each of your function executions, but it has a hard limit of 512 MB in size (see <a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">docs</a>).</p>
+
+<h3 id="on-downloading-objects-from-s3">On downloading objects from S3</h3>
+
+<p>When you need to get an object from S3, it often makes sense to just download it to disk. This seems intuitive and easy, and is a very common practice. You may even do this when you only need the object in RAM, by downloading it first to your filesystem and then loading it into your program from there:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">boto3</span>
+<span class="n">s3_resource</span> <span class="o">=</span> <span class="n">boto3</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s">'s3'</span><span class="p">)</span>
+
+<span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_resource</span><span class="p">.</span><span class="n">Object</span><span class="p">(</span><span class="s">'my-bucket'</span><span class="p">,</span> <span class="s">'my_file.txt'</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'temp_my_file.txt'</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">s3_object</span><span class="p">.</span><span class="n">download_fileobj</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># do something with temp_my_file.txt, remember to delete it if appropriate.
+</span></code></pre></div></div>
+
+<p>However, if you’re going to download the S3 object to disk only to then load and use it in RAM, then you’d probably prefer it if there was a way to get the object into RAM directly.</p>
+
+<h3 id="on-using-popular-ml-libraries">On using popular ML libraries</h3>
+
+<p>Popular libraries that offer pre-trained models (such as <a href="https://huggingface.co/models">Hugging Face</a>, <a href="https://github.com/openai/CLIP">OpenAI’s CLIP</a> or <a href="https://github.com/JaidedAI/EasyOCR">JaidedAI’s EasyOCR</a>) usually use your filesystem to download models to and to use as cache. Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.</p>
+
+<h2 id="piecing-it-together">Piecing it together</h2>
+
+<p>Deploying ML inference code is a worthy use case for AWS Lambda. But, in light of popular libraries relying on disk space for getting you pre-trained models, if you use enough of these then your Lambdas are liable to eventually run into the 512 MB limit. This would also be the case if you don’t download pre-trained models but you do rely on getting models (either pre-downloaded, trained by you or whatever the case may be) from S3 and you’re used to interacting with S3 the way I showed before.</p>
+
+<p>So, you’re probably able to piece the idea together by yourself: if only there was a way to stream S3 objects directly into memory, we’d be good to go and on our way. In that case, whenever your Lambda-bound code needs to use models that are large enough, you could serialize them (e.g by using <code class="language-plaintext highlighter-rouge">pickle</code> or library-specific serialization options), upload them to S3 and then use this hypothetical method to load them directly into RAM without worrying too much about the storage space quota. This also would be true whether you’re using pre-trained models such as the ones mentioned before, which you may pre-download and pickle, or models you train yourself.</p>
+
+<p>I’m probably not spoiling anything if I tell you that there is such a way indeed. To show you how it may work with an example, let’s assume we’re using PyTorch and we’ve pickled and uploaded the <code class="language-plaintext highlighter-rouge">state_dict</code> of an instance of <code class="language-plaintext highlighter-rouge">Model</code> to S3 at <code class="language-plaintext highlighter-rouge">models-bucket/model_state_dict.pkl</code>.</p>
+
+<p>Starting with the code from before, we add some imports:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="n">s3_resource</span> <span class="o">=</span> <span class="n">boto3</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s">'s3'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We then stream the pickled <code class="language-plaintext highlighter-rouge">state_dict</code> into a variable rather than save to disk:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bytes_stream</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">BytesIO</span><span class="p">()</span>
+<span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_resource</span><span class="p">.</span><span class="n">Object</span><span class="p">(</span><span class="s">'models-bucket'</span><span class="p">,</span> <span class="s">'model_state_dict.pkl'</span><span class="p">)</span>
+<span class="n">s3_object</span><span class="p">.</span><span class="n">download_fileobj</span><span class="p">(</span><span class="n">bytes_stream</span><span class="p">)</span>
+<span class="n">pickled_state_dict</span> <span class="o">=</span> <span class="n">bytes_stream</span><span class="p">.</span><span class="n">getvalue</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Finally, we load the model:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">state_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickled_state_dict</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+<span class="n">model</span><span class="p">.</span><span class="nb">eval</span><span class="p">()</span>
+
+<span class="c1"># Have fun with model
+</span></code></pre></div></div>
+
+<h3 id="a-final-note">A final note</h3>
+
+<p>Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs closely enough. However, it seems worth highlighting in the particular context of deploying ML code to Lambda as this is an increasingly popular practice and this little pattern easily solves an issue that anyone starting to adopt it is bound to encounter.</p>
+
+:ET
