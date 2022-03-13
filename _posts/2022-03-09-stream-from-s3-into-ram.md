@@ -9,14 +9,22 @@ tags:
 
 ## Introduction
 
-I'd like to share a "pattern" that emerged in my work deploying ML inference Python code to AWS Lambda. To do this, first allow me to offer three quick observations that will help us tie this pattern together. 
+I'd like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I'll offer three observations. Then, we'll derive two practices from those observations that you might want to consider for your own processes. 
 
-### On Lambda and its storage quota
-AWS Lambda can be a convenient way of deploying production code for many use cases. However, as can expected from such high-level services, it also comes with some limitations. In particular, it has a strict storage space quota: Lambda provides a filesystem on an ephemeral storage space for you to use under `/tmp` in each of your function executions, but it has a hard limit of 512 MB in size (see [docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)).
+## Observations
 
-### On downloading objects from S3
+### 1. On Lambda and its filesystem feature
+AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under `/tmp` and has a hard limit of 512 MB in size (see [docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)).
 
-When you need to get an object from S3, it often makes sense to just download it to disk. This seems intuitive and easy, and is a very common practice. You may even do this when you only need the object in RAM, by downloading it first to your filesystem and then loading it into your program from there:
+### 2. On using popular ML libraries  
+
+Popular ML libraries that offer pre-trained models (such as [Hugging Face](https://huggingface.co/models), [OpenAI's CLIP](https://github.com/openai/CLIP) or [JaidedAI's EasyOCR](https://github.com/JaidedAI/EasyOCR)) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they'd use as cache, but they usually expose a way to configure the paths they'll use. On the other hand, as far as I can tell at this point in time, they don't usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for one's process since it allows for a smoother iteration on code development, but it also means you're forced to rely on a filesystem, and one with sufficient available space, to be able to get your models downloaded.
+
+Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.
+
+### 3. On downloading objects from S3
+
+When you need to get an object from S3, you often just need to download it to disk. This seems intuitive and easy, and is a common practice. You may even do this when you only need the object in RAM, by downloading it first to your filesystem and then loading it into your program from there:
 
 ```python
 import boto3
@@ -29,39 +37,61 @@ with open('temp_my_file.txt', 'w') as f:
 # do something with temp_my_file.txt, remember to delete it if appropriate.
 ```
 
-However, if you're going to download the S3 object to disk only to then load and use it in RAM, then you'd probably prefer it if there was a way to get the object into RAM directly.
+However, if you're going to download the S3 object to disk only to then load and use it in RAM, then you'd probably prefer a way to get the object into RAM directly.
 
-### On using popular ML libraries  
+## Deriving practices
 
-Popular libraries that offer pre-trained models (such as [Hugging Face](https://huggingface.co/models), [OpenAI's CLIP](https://github.com/openai/CLIP) or [JaidedAI's EasyOCR](https://github.com/JaidedAI/EasyOCR)) usually use your filesystem to download models to and to use as cache. Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.
+Deploying ML inference code is a worthy use case for Lambda. But, in light of popular libraries relying on disk space for getting you pre-trained models, if you use enough of these then your lambdas are liable to eventually run into the 512 MB limit. This would be the case even if you don't download pre-trained models but you do rely on getting models (either pre-downloaded, trained by you or whatever the case may be) from a remote storage service with which you're interacting in a similar way to what I showed before with S3.
 
-## Piecing it together
+So, to solve this potential and likely issue, two good practices you may want to adopt follow.
 
-Deploying ML inference code is a worthy use case for AWS Lambda. But, in light of popular libraries relying on disk space for getting you pre-trained models, if you use enough of these then your Lambdas are liable to eventually run into the 512 MB limit. This would also be the case if you don't download pre-trained models but you do rely on getting models (either pre-downloaded, trained by you or whatever the case may be) from S3 and you're used to interacting with S3 the way I showed before.
+### 1. Make libraries' on-disk cache path configurable by environment
 
-So, you're probably able to piece the idea together by yourself: if only there was a way to stream S3 objects directly into memory, we'd be good to go and on our way. In that case, whenever your Lambda-bound code needs to use models that are large enough, you could serialize them (e.g by using `pickle` or library-specific serialization options), upload them to S3 and then use this hypothetical method to load them directly into RAM without worrying too much about the storage space quota. This also would be true whether you're using pre-trained models such as the ones mentioned before, which you may pre-download and pickle, or models you train yourself.
+Either on a model-by-model basis or for all of your library-downloaded models, leverage these libraries' options to configure cache paths and use environment variables to set them. If you work with a separate ML team that writes your Lambda-bound code, encourage them to adopt this practice on your behalf. That way, when you deploy your code to Lambda, you'll be able to easily have those paths stem from `/tmp` and to avoid "read-only filesystem" errors coming from your libraries attempting to write to off-limits paths. This won't save you from running into the storage space limit, but it will make deployment easier while your space usage is within bounds.
 
-I'm probably not spoiling anything if I tell you that there is such a way indeed. To show you how it may work with an example, let's assume we're using PyTorch and we've pickled and uploaded the `state_dict` of an instance of `Model` to S3 at `models-bucket/model_state_dict.pkl`.
+To view this in an example, let's assume our code uses CLIP's `ViT-B/32` and Hugging Face's `bert-base-cased`. This means our code at a certain point might include some lines like:
 
-Starting with the code from before, we add some imports:
+```python
+import clip
+from transformers import BertModel
+
+model, preprocess = clip.load('ViT-B/32')
+bert = BertModel.from_pretrained('bert-base-cased')
+```
+
+The default cache dirs used by `clip` and `transformers` in these function calls are (at this point in time) under `~/.cache`, namely `~/.cache/torch/transformers` and `~/.cache/clip` respectively. To adopt this practice, you'd set something like a `MODEL_CACHE_FS_PATH` environment variable to a path starting with `/tmp` and use those libraries' cache path configuration options:
+
+```python
+import os
+import clip
+from transformers import BertModel
+
+configured_cache_path = os.environ.get('MODEL_CACHE_FS_PATH', './cache')
+
+model, preprocess = clip.load('ViT-B/32', download_root=configured_cache_path)
+bert = BertModel.from_pretrained('bert-base-cased', cache_dir=configured_cache_path)
+```
+
+### Use S3 to store models and stream them into RAM
+
+Once your library-downloaded models (or other large files you may need) conspire to exceed the 512 MB to your lambdas, you'll need a way to download them that does not require a filesystem. S3 is indeed a good option, since it does offer an easy way to stream objects directly to RAM. If you're deploying Python code to Lambda, this is very easy to do using `boto3`. The way you might take advantage of this option is to pre-download the models you've been getting through your libraries' API, serialize them (e.g by using `pickle` or library-specific serialization APIs), upload the serialized files to S3 and then fetch those objects in your Lambda-bound code in a way that gets them into RAM directly. Note, of course, that this is useful for models you get from other sources as well, such as the ones you train yourself. 
+
+To quickly look at an example for this, let's assume we're using PyTorch and you've pickled and uploaded the `state_dict` of an instance of `Model` to S3 at `models-bucket/model_state_dict.pkl`. This is what your code might look like.
+
 ```python
 import io
 import pickle
 
 import boto3
 s3_resource = boto3.resource('s3')
-```
 
-We then stream the pickled `state_dict` into a variable rather than save to disk:
-```python
+# Stream pickled `state_dict` into variable rather than save to disk
 bytes_stream = io.BytesIO()
 s3_object = s3_resource.Object('models-bucket', 'model_state_dict.pkl')
 s3_object.download_fileobj(bytes_stream)
 pickled_state_dict = bytes_stream.getvalue()
-```
 
-Finally, we load the model:
-```python
+# Load model
 state_dict = pickle.loads(pickled_state_dict)
 model = Model()
 model.load_state_dict(state_dict)
@@ -72,6 +102,6 @@ model.eval()
 
 ### A final note
 
-Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs closely enough. However, it seems worth highlighting in the particular context of deploying ML code to Lambda as this is an increasingly popular practice and this little pattern easily solves an issue that anyone starting to adopt it is bound to encounter.
+Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.
 
 
