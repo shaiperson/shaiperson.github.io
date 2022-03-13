@@ -7,8 +7,8 @@
 <meta name="generator" content="Jekyll v4.2.1" />
 <meta property="og:title" content="ML on AWS Lambda: Two Practices" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Introduction" />
-<meta property="og:description" content="Introduction" />
+<meta name="description" content="Observations" />
+<meta property="og:description" content="Observations" />
 <link rel="canonical" href="/2022/03/09/stream-from-s3-into-ram.html" />
 <meta property="og:url" content="/2022/03/09/stream-from-s3-into-ram.html" />
 <meta property="og:site_name" content="Blog" />
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="ML on AWS Lambda: Two Practices" />
 <script type="application/ld+json">
-{"dateModified":"2022-03-09T12:55:00-03:00","datePublished":"2022-03-09T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/09/stream-from-s3-into-ram.html"},"url":"/2022/03/09/stream-from-s3-into-ram.html","description":"Introduction","headline":"ML on AWS Lambda: Two Practices","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"dateModified":"2022-03-09T12:55:00-03:00","datePublished":"2022-03-09T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/09/stream-from-s3-into-ram.html"},"url":"/2022/03/09/stream-from-s3-into-ram.html","description":"Observations","headline":"ML on AWS Lambda: Two Practices","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -47,11 +47,9 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <h2 id="introduction">Introduction</h2>
+    <h2 id="observations">Observations</h2>
 
 <p>I’d like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I’ll offer three observations. Then, we’ll derive two practices from those observations that you might want to consider for your own processes.</p>
-
-<h2 id="observations">Observations</h2>
 
 <h3 id="1-on-lambda-and-its-filesystem-feature">1. On Lambda and its filesystem feature</h3>
 <p>AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under <code class="language-plaintext highlighter-rouge">/tmp</code> and has a hard limit of 512 MB in size (see <a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">docs</a>).</p>

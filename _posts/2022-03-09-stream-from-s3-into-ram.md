@@ -5,13 +5,11 @@ date: 2022-03-09 12:55:00 -0300
 tags:
   - ml-ops
   - tech
----
-
-## Introduction
-
-I'd like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I'll offer three observations. Then, we'll derive two practices from those observations that you might want to consider for your own processes. 
+--- 
 
 ## Observations
+
+I'd like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I'll offer three observations. Then, we'll derive two practices from those observations that you might want to consider for your own processes.
 
 ### 1. On Lambda and its filesystem feature
 AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under `/tmp` and has a hard limit of 512 MB in size (see [docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)).
