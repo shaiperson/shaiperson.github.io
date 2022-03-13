@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "ML on AWS Lambda: Stream models from S3 into RAM"
+title: "ML on AWS Lambda: Two Practices"
 date: 2022-03-09 12:55:00 -0300
 tags:
   - ml-ops
