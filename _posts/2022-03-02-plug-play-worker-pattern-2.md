@@ -117,51 +117,53 @@ def run_on_url(url):
     return _pred_to_label(pred)
 ```
 
-We also define a `server` module responsible for exposing the classifier on a local HTTP endpoint. We use the Python `http` module to set up a simple local HTTP server that calls `classifier.run_on_url` upon `POST` requests on `/`  with a JSON body containing an image URL.
+We also define a `server` module responsible for exposing the classifier on a local HTTP endpoint. We use the FastAPI and `uvicorn` to set up a simple API on a local HTTP server that calls `classifier.run_on_url` upon `POST` requests on `/`  with a JSON body containing an image URL. It looks something like this.
 
+Some relevant imports. `exceptions` is a local module defining expected exceptions in our application (find it in the code).
 ```python
-class ClassifierServer(BaseHTTPRequestHandler):
-    def _set_response(self, code, content_type):
-        self.send_response(code)
-        self.send_header('Content-type', content_type)
-        self.end_headers()
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
-    def do_POST(self):
-        # Process request
-        try:
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            post_json = json.loads(post_data)
-            image_url = post_json['url']
-
-        except ValueError as e:
-            logger.error('ValueError while parsing body as JSON')
-            response_body = {'message': f'Task body not valid JSON: "{e}"'}
-            self._set_response(400, 'application/json')
-
-        except KeyError as e:
-            response_body = {'message': f'Task body missing field {e}'}
-            self._set_response(400, 'application/json')
-
-        else:
-            try:
-                logger.debug('Running algorithm on URL {}'.format(image_url))
-                result = classifier.run_on_url(image_url)
-                response_body = {'result': result}
-                self._set_response(200, 'application/json')
-
-            except exceptions.RequestError as e:
-                response_body = {'message': f'Error fetching request image, received {e.response.status_code}'}
-                self._set_response(e.response.status_code, 'application/json')
-
-            except Exception as e:
-                response_body = {'message': 'Internal error', 'error': error_str}
-                self._set_response(500, 'application/json')
-
-        self.wfile.write(json.dumps(response_body).encode('utf-8'))
+import classifier
+import exceptions
 ```
 
-Notice the error management. As we saw above, the controller looks out for an error status being returned by its runner and does some management of the failure to process a given message (like logging it and/or sending it to a dead-letter exchange). So in implementing the runner, we want to be diligent in capturing expected errors so that we can return meaningful error status for the controller to handle, which will later help us quickly understand failed messages and be robust in managing unexpected errors.
+Define request and response models using Pydantic.
+```python
+class ClassificationRequest(BaseModel):
+    image_url: str
+
+class ClassificationResponse(BaseModel):
+    label: str
+    score: float
+```
+
+Define the FastAPI app and the API.
+```python
+app = FastAPI()
+
+@app.post("/", status_code=200)
+async def create_item(request: ClassificationRequest):
+    try:
+        logger.info('Running classifier on URL'.format(request.image_url))
+        label, score = classifier.run_on_url(request.image_url)
+        return ClassificationResponse(label=label, score=score)
+
+    except exceptions.RequestError as e:
+        raise HTTPException(status_code=400, detail=f'Error fetching request image, received {e.response.status_code}')
+
+    except Exception as e:
+        error_str = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=error_str)
+```
+
+Run the server when main.
+```python
+if __name__ == '__main__':
+    uvicorn.run(app)
+```
+
+Notice we leverage FastAPI automatic model validation on our endpoint and we do some additional error management for errors we can expect coming from our processing of that payload. As we saw above, the controller looks out for an error status being returned by its runner and does some management itself of the failure to process a given message (like logging it and/or sending it to a dead-letter exchange). So in implementing the runner, we want to be diligent in capturing expected errors so that we can return a meaningful status for the controller to handle, which will later help us understand failed messages more easily and be robust in managing unexpected errors.
 
 ### Dockerization, Compose File
 

@@ -157,50 +157,49 @@
     <span class="k">return</span> <span class="n">_pred_to_label</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>We also define a <code class="language-plaintext highlighter-rouge">server</code> module responsible for exposing the classifier on a local HTTP endpoint. We use the Python <code class="language-plaintext highlighter-rouge">http</code> module to set up a simple local HTTP server that calls <code class="language-plaintext highlighter-rouge">classifier.run_on_url</code> upon <code class="language-plaintext highlighter-rouge">POST</code> requests on <code class="language-plaintext highlighter-rouge">/</code>  with a JSON body containing an image URL.</p>
+<p>We also define a <code class="language-plaintext highlighter-rouge">server</code> module responsible for exposing the classifier on a local HTTP endpoint. We use the FastAPI and <code class="language-plaintext highlighter-rouge">uvicorn</code> to set up a simple API on a local HTTP server that calls <code class="language-plaintext highlighter-rouge">classifier.run_on_url</code> upon <code class="language-plaintext highlighter-rouge">POST</code> requests on <code class="language-plaintext highlighter-rouge">/</code>  with a JSON body containing an image URL. It looks something like this.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ClassifierServer</span><span class="p">(</span><span class="n">BaseHTTPRequestHandler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">_set_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">content_type</span><span class="p">):</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">'Content-type'</span><span class="p">,</span> <span class="n">content_type</span><span class="p">)</span>
-        <span class="bp">self</span><span class="p">.</span><span class="n">end_headers</span><span class="p">()</span>
+<p>Some relevant imports. <code class="language-plaintext highlighter-rouge">exceptions</code> is a local module defining expected exceptions in our application (find it in the code).</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 
-    <span class="k">def</span> <span class="nf">do_POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Process request
-</span>        <span class="k">try</span><span class="p">:</span>
-            <span class="n">content_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">headers</span><span class="p">[</span><span class="s">'Content-Length'</span><span class="p">])</span>
-            <span class="n">post_data</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">rfile</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">content_length</span><span class="p">)</span>
-            <span class="n">post_json</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">post_data</span><span class="p">)</span>
-            <span class="n">image_url</span> <span class="o">=</span> <span class="n">post_json</span><span class="p">[</span><span class="s">'url'</span><span class="p">]</span>
-
-        <span class="k">except</span> <span class="nb">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s">'ValueError while parsing body as JSON'</span><span class="p">)</span>
-            <span class="n">response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'message'</span><span class="p">:</span> <span class="sa">f</span><span class="s">'Task body not valid JSON: "</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s">"'</span><span class="p">}</span>
-            <span class="bp">self</span><span class="p">.</span><span class="n">_set_response</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s">'application/json'</span><span class="p">)</span>
-
-        <span class="k">except</span> <span class="nb">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'message'</span><span class="p">:</span> <span class="sa">f</span><span class="s">'Task body missing field </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s">'</span><span class="p">}</span>
-            <span class="bp">self</span><span class="p">.</span><span class="n">_set_response</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s">'application/json'</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'Running algorithm on URL {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">image_url</span><span class="p">))</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">.</span><span class="n">run_on_url</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
-                <span class="n">response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'result'</span><span class="p">:</span> <span class="n">result</span><span class="p">}</span>
-                <span class="bp">self</span><span class="p">.</span><span class="n">_set_response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s">'application/json'</span><span class="p">)</span>
-
-            <span class="k">except</span> <span class="n">exceptions</span><span class="p">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'message'</span><span class="p">:</span> <span class="sa">f</span><span class="s">'Error fetching request image, received </span><span class="si">{</span><span class="n">e</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">status_code</span><span class="si">}</span><span class="s">'</span><span class="p">}</span>
-                <span class="bp">self</span><span class="p">.</span><span class="n">_set_response</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">status_code</span><span class="p">,</span> <span class="s">'application/json'</span><span class="p">)</span>
-
-            <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">response_body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'message'</span><span class="p">:</span> <span class="s">'Internal error'</span><span class="p">,</span> <span class="s">'error'</span><span class="p">:</span> <span class="n">error_str</span><span class="p">}</span>
-                <span class="bp">self</span><span class="p">.</span><span class="n">_set_response</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="s">'application/json'</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="p">.</span><span class="n">wfile</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_body</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">classifier</span>
+<span class="kn">import</span> <span class="nn">exceptions</span>
 </code></pre></div></div>
 
-<p>Notice the error management. As we saw above, the controller looks out for an error status being returned by its runner and does some management of the failure to process a given message (like logging it and/or sending it to a dead-letter exchange). So in implementing the runner, we want to be diligent in capturing expected errors so that we can return meaningful error status for the controller to handle, which will later help us quickly understand failed messages and be robust in managing unexpected errors.</p>
+<p>Define request and response models using Pydantic.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ClassificationRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="k">class</span> <span class="nc">ClassificationResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+</code></pre></div></div>
+
+<p>Define the FastAPI app and the API.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">"/"</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">create_item</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">ClassificationRequest</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Running classifier on URL'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">image_url</span><span class="p">))</span>
+        <span class="n">label</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">.</span><span class="n">run_on_url</span><span class="p">(</span><span class="n">request</span><span class="p">.</span><span class="n">image_url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ClassificationResponse</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">exceptions</span><span class="p">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s">'Error fetching request image, received </span><span class="si">{</span><span class="n">e</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">status_code</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">error_str</span> <span class="o">=</span> <span class="n">traceback</span><span class="p">.</span><span class="n">format_exc</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="n">error_str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Run the server when main.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">uvicorn</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Notice we leverage FastAPI automatic model validation on our endpoint and we do some additional error management for errors we can expect coming from our processing of that payload. As we saw above, the controller looks out for an error status being returned by its runner and does some management itself of the failure to process a given message (like logging it and/or sending it to a dead-letter exchange). So in implementing the runner, we want to be diligent in capturing expected errors so that we can return a meaningful status for the controller to handle, which will later help us understand failed messages more easily and be robust in managing unexpected errors.</p>
 
 <h3 id="dockerization-compose-file">Dockerization, Compose File</h3>
 
