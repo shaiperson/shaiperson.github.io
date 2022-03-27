@@ -102,7 +102,7 @@ Note too that this pattern constrains the initialization order of components. Ru
 3. Controller initializes, GETs algorithm-to-port mapping from Runner Discovery.
 4. Controller sends algorithm requests to runners until work is done.
 
-For reference, this what the general case might look like:
+For reference, this is what the general case might look like:
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled%203.png" style="display: block; margin-left: auto; margin-right: auto; width: 50%;"/>
 

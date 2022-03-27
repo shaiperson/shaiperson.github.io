@@ -31,7 +31,7 @@ In Part II, we'll go through implementing the naïve design. This is useful most
 
 ### A note on implementation and code structure
 
-As explained in Part I, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is in branch `initial`. 
+As explained in Part I, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is available in branch `initial`. 
 
 The code for all components is placed in a single repository. Looking at the repo, you'll find a directory for each component with its source files, Dockerfile and a `build.sh ` script. The `worker` and `producer` directories are there to assist in running and testing everything locally.
 
@@ -119,7 +119,7 @@ def run_on_url(url):
 
 We also define a `server` module responsible for exposing the classifier on a local HTTP endpoint. We use the FastAPI and `uvicorn` to set up a simple API on a local HTTP server that calls `classifier.run_on_url` upon `POST` requests on `/`  with a JSON body containing an image URL. It looks something like this.
 
-Some relevant imports. `exceptions` is a local module defining expected exceptions in our application (find it in the code).
+Some relevant imports. `exceptions` is a local module defining expected exceptions in our application (find it in the repo).
 ```python
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -143,7 +143,7 @@ Define the FastAPI app and the API.
 app = FastAPI()
 
 @app.post("/", status_code=200)
-async def create_item(request: ClassificationRequest):
+async def run_algorithm(request: ClassificationRequest):
     try:
         logger.info('Running classifier on URL'.format(request.image_url))
         label, score = classifier.run_on_url(request.image_url)
@@ -172,13 +172,17 @@ I tend to favor containerizing all components that go into a worker setup as thi
 #### Controller Dockerfile
 
 ```dockerfile
-FROM python:3.7
+FROM tensorflow/tensorflow
 
 WORKDIR /opt/project
 
-COPY ./* ./
+COPY ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install pillow
 
-RUN pip install -r requirements.txt
+COPY ./model ./model
+
+COPY ./* ./
 ```
 
 #### Classifier Dockerfile
