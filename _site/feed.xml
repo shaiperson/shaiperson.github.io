@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-27T19:46:13-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="http://localhost:4000/2022/03/09/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/09/ml-on-lambda-two-practices</id><content type="html" xml:base="http://localhost:4000/2022/03/09/ml-on-lambda-two-practices.html">&lt;h2 id=&quot;observations&quot;&gt;Observations&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-27T22:07:09-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="http://localhost:4000/2022/03/09/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/09/ml-on-lambda-two-practices</id><content type="html" xml:base="http://localhost:4000/2022/03/09/ml-on-lambda-two-practices.html">&lt;h2 id=&quot;observations&quot;&gt;Observations&lt;/h2&gt;
 
 &lt;p&gt;I’d like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I’ll offer three observations. Then, we’ll derive two practices from those observations that you might want to consider for your own processes.&lt;/p&gt;
 
@@ -406,12 +406,12 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
 
-&lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/algorithms'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;register_algorithm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AlgorithmRegistrationRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Registering algorithm &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;algorithm&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; as hosted on &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;algorithm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;
 
-&lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/algorithms'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_registry&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -448,6 +448,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;inspect&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;re&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;urllib.parse&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;urljoin&lt;/span&gt;
 
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;requests&lt;/span&gt;
 
@@ -471,7 +472,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 &lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;unsuccessful&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;handlers_by_algorithm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;body&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'algorithm'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;algorithm_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'host'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;settings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;settings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner_discovery_uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;urljoin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;settings&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner_discovery_uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'algorithms'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;raise_for_status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -596,9 +597,10 @@ for name, handler in handlers_by_algorithm.items():
 
 &lt;h3 id=&quot;extending-the-controller&quot;&gt;Extending the controller&lt;/h3&gt;
 
-&lt;p&gt;The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery RUnner, just send a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GET /&lt;/code&gt; request to it and get a dictionary that maps algorithm names to local runner hosts.&lt;/p&gt;
+&lt;p&gt;The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GET /algorithms&lt;/code&gt; request to it and get a dictionary that maps algorithm names to local runner hosts.&lt;/p&gt;
 
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;runner_registry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'GET'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;runner_discovery_uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;urllib.parse&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;urljoin&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;runner_registry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'GET'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;urljoin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;runner_discovery_uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'algorithms'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;If we tweak format of messages sent to the queue to include the name of an algorithm to run alongisde the data to run it on, then the algorithm name can be used to get the corresponding runner host that supports that algorithm by reading &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_registry&lt;/code&gt;. If &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;algorithm&lt;/code&gt; is the field in the queue message’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;body&lt;/code&gt; that gives us that name and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;payload&lt;/code&gt; is the field with the data to run it on (compliant with the runner’s algorithm handler arguments as defined in its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt;), then the following bit of code gets us home:&lt;/p&gt;
@@ -664,11 +666,57 @@ for name, handler in handlers_by_algorithm.items():
 
 &lt;h3 id=&quot;trying-it-out&quot;&gt;Trying it out&lt;/h3&gt;
 
+&lt;p&gt;Let’s run the same example as in the previous article, just to replicate the same usage and see that it still works.&lt;/p&gt;
+
+&lt;p&gt;First, selecting a few logs line from the initialization to see how it’s looking now. We can see the interactions between the runner looking for handlers in the runner’s adapter module, registering them and the controller discovering them by querying the Discovery component.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
+meme-classifier-runner    | INFO :: [Discovery] :: Found handlers: run_meme_classifier
+meme-classifier-runner    | INFO :: [Discovery] :: Registering algorithm meme_classifier
+runner-discovery          | INFO:     172.19.0.5:48300 - &quot;GET /algorithms HTTP/1.1&quot; 200 OK
+controller                | INFO :: Obtained runner registry: {'meme_classifier': 'http://meme-classifier-runner:5000'}
+...
+controller                | INFO :: [+] Listening for messages on queue tasks
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;From a terminal at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;./producer/&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python main.py &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+meme_classifier &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;'{&quot;image_url&quot;: &quot;https://memegenerator.net/img/instances/39673831.jpg&quot;}'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note now the helper script at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;./producer/main.py&lt;/code&gt; takes an algorithm name as argument as well, since our environment now supports running multiple algorithms and, as we covered before, the message format expected by the controller now includes this parameter.&lt;/p&gt;
+
+&lt;p&gt;Logs after sending the message:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;controller                | INFO :: Received message {'algorithm': 'meme_classifier', 'payload': {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}}
+controller                | INFO :: Calling runner on http://meme-classifier-runner:5000/run/meme_classifier
+meme-classifier-runner    | INFO :: [Server] :: Received request to run algorithm SupportedAlgorithm.meme_classifier on payload {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}
+meme-classifier-runner    | INFO:     172.19.0.5:50060 - &quot;POST /run/meme_classifier HTTP/1.1&quot; 200 OK
+controller                | INFO :: Received result from runner: {'result': {'label': 'matrix_morpheus', 'score': 0.99998}}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the controller sends its request for a run of the meme classifier at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://meme-classifier-runner:5000&lt;/code&gt; which is the URI it received before from the Discovery Runner when sending &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GET /algorithms&lt;/code&gt; to it.&lt;/p&gt;
+
 &lt;h2 id=&quot;so-is-it-really-that-extensible&quot;&gt;So, is it really that extensible?&lt;/h2&gt;
+
+&lt;p&gt;We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.&lt;/p&gt;
+
+&lt;p&gt;You might remember that, in Part I, we motivated designing the pattern by the example of a fictitious image board company that decided it needed to run a meme classifier on images posted to i by users. So to make the test a bit more elegant, let’s actually add some algorithms in the same vain.&lt;/p&gt;
 
 &lt;h3 id=&quot;adding-a-new-algorithm-to-an-existing-runner-container&quot;&gt;Adding a new algorithm to an existing runner container&lt;/h3&gt;
 
+&lt;p&gt;Se agrega OCR.&lt;/p&gt;
+
+&lt;p&gt;… código, todo nice&lt;/p&gt;
+
 &lt;h3 id=&quot;adding-a-new-runner-container&quot;&gt;Adding a new runner container&lt;/h3&gt;
+
+&lt;p&gt;Ahora se agrega detección de idioma, va en otro container porque es otro repo nuevo todo NLP&lt;/p&gt;
+
+&lt;h2 id=&quot;bonus&quot;&gt;Bonus&lt;/h2&gt;
+
+&lt;p&gt;La generación dinámica de modelos permite documentación, mostrar script para obtener schemas de runners y cómo quedan los schemas.&lt;/p&gt;
 
 &lt;h2 id=&quot;conclusions&quot;&gt;Conclusions&lt;/h2&gt;
 

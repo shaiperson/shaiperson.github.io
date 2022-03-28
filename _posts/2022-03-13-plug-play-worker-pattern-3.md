@@ -75,16 +75,15 @@ app = FastAPI()
 
 registry = {}
 
-@app.post('/')
+@app.post('/algorithms')
 async def register_algorithm(request: AlgorithmRegistrationRequest):
     logger.info(f'Registering algorithm {request.algorithm} as hosted on {request.host}')
     registry[request.algorithm] = request.host
 
-@app.get('/')
+@app.get('/algorithms')
 async def get_registry():
     return registry
 ```
- 
  
 ### Extending the runners
  
@@ -117,6 +116,7 @@ We're now ready to code the `register_all` function. The function first imports 
 ```python
 import inspect
 import re
+from urllib.parse import urljoin
 
 import requests
 
@@ -140,7 +140,7 @@ def register_all():
     unsuccessful = []
     for name in handlers_by_algorithm:
         body = {'algorithm': algorithm_name, 'host': settings.host}
-        response = requests.post(settings.runner_discovery_uri, json=body)
+        response = requests.post(urljoin(settings.runner_discovery_uri, 'algorithms'), json=body)
         response.raise_for_status()
 ```
 
@@ -274,10 +274,11 @@ By installing `runnerlib` in a runner's container, it's available to run inside 
 
 ### Extending the controller
 
-The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery RUnner, just send a `GET /` request to it and get a dictionary that maps algorithm names to local runner hosts.
+The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a `GET /algorithms` request to it and get a dictionary that maps algorithm names to local runner hosts.
 
 ```python
-runner_registry = requests.request('GET', runner_discovery_uri).json()
+from urllib.parse import urljoin
+runner_registry = requests.request('GET', urljoin(runner_discovery_uri, 'algorithms')).json()
 ```
 
 If we tweak format of messages sent to the queue to include the name of an algorithm to run alongisde the data to run it on, then the algorithm name can be used to get the corresponding runner host that supports that algorithm by reading `runner_registry`. If `algorithm` is the field in the queue message's `body` that gives us that name and `payload` is the field with the data to run it on (compliant with the runner's algorithm handler arguments as defined in its `runner_adapter`), then the following bit of code gets us home:
@@ -347,11 +348,60 @@ controller:
 
 ### Trying it out
 
+Let's run the same example as in the previous article, just to replicate the same usage and see that it still works.
+
+First, selecting a few logs line from the initialization to see how it's looking now. We can see the interactions between the runner looking for handlers in the runner's adapter module, registering them and the controller discovering them by querying the Discovery component.
+```
+...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
+meme-classifier-runner    | INFO :: [Discovery] :: Found handlers: run_meme_classifier
+meme-classifier-runner    | INFO :: [Discovery] :: Registering algorithm meme_classifier
+runner-discovery          | INFO:     172.19.0.5:48300 - "GET /algorithms HTTP/1.1" 200 OK
+controller                | INFO :: Obtained runner registry: {'meme_classifier': 'http://meme-classifier-runner:5000'}
+...
+controller                | INFO :: [+] Listening for messages on queue tasks
+```
+
+From a terminal at `./producer/`:
+```bash
+python main.py \
+meme_classifier \
+'{"image_url": "https://memegenerator.net/img/instances/39673831.jpg"}'
+```
+
+Note now the helper script at `./producer/main.py` takes an algorithm name as argument as well, since our environment now supports running multiple algorithms and, as we covered before, the message format expected by the controller now includes this parameter.
+
+Logs after sending the message:
+```
+controller                | INFO :: Received message {'algorithm': 'meme_classifier', 'payload': {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}}
+controller                | INFO :: Calling runner on http://meme-classifier-runner:5000/run/meme_classifier
+meme-classifier-runner    | INFO :: [Server] :: Received request to run algorithm SupportedAlgorithm.meme_classifier on payload {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}
+meme-classifier-runner    | INFO:     172.19.0.5:50060 - "POST /run/meme_classifier HTTP/1.1" 200 OK
+controller                | INFO :: Received result from runner: {'result': {'label': 'matrix_morpheus', 'score': 0.99998}}
+```
+
+Note the controller sends its request for a run of the meme classifier at `http://meme-classifier-runner:5000` which is the URI it received before from the Discovery Runner when sending `GET /algorithms` to it.
+
 ## So, is it really that extensible?
+
+We couldn't end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.
+
+You might remember that, in Part I, we motivated designing the pattern by the example of a fictitious image board company that decided it needed to run a meme classifier on images posted to i by users. So to make the test a bit more elegant, let's actually add some algorithms in the same vain. 
 
 ### Adding a new algorithm to an existing runner container
 
+Se agrega OCR.
+
+... código, todo nice
+
 ### Adding a new runner container
+
+Ahora se agrega detección de idioma, va en otro container porque es otro repo nuevo todo NLP
+
+## Bonus
+
+La generación dinámica de modelos permite documentación, mostrar script para obtener schemas de runners y cómo quedan los schemas.
 
 ## Conclusions
  

@@ -120,12 +120,12 @@
 
 <span class="n">registry</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s">'/algorithms'</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">register_algorithm</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">AlgorithmRegistrationRequest</span><span class="p">):</span>
     <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'Registering algorithm </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">algorithm</span><span class="si">}</span><span class="s"> as hosted on </span><span class="si">{</span><span class="n">request</span><span class="p">.</span><span class="n">host</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
     <span class="n">registry</span><span class="p">[</span><span class="n">request</span><span class="p">.</span><span class="n">algorithm</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">host</span>
 
-<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">'/algorithms'</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span> <span class="nf">get_registry</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">registry</span>
 </code></pre></div></div>
@@ -162,6 +162,7 @@
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
 
@@ -185,7 +186,7 @@
 </span>    <span class="n">unsuccessful</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">handlers_by_algorithm</span><span class="p">:</span>
         <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s">'algorithm'</span><span class="p">:</span> <span class="n">algorithm_name</span><span class="p">,</span> <span class="s">'host'</span><span class="p">:</span> <span class="n">settings</span><span class="p">.</span><span class="n">host</span><span class="p">}</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">runner_discovery_uri</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">settings</span><span class="p">.</span><span class="n">runner_discovery_uri</span><span class="p">,</span> <span class="s">'algorithms'</span><span class="p">),</span> <span class="n">json</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
         <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>
 </code></pre></div></div>
 
@@ -310,9 +311,10 @@ for name, handler in handlers_by_algorithm.items():
 
 <h3 id="extending-the-controller">Extending the controller</h3>
 
-<p>The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery RUnner, just send a <code class="language-plaintext highlighter-rouge">GET /</code> request to it and get a dictionary that maps algorithm names to local runner hosts.</p>
+<p>The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it and get a dictionary that maps algorithm names to local runner hosts.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">runner_registry</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">'GET'</span><span class="p">,</span> <span class="n">runner_discovery_uri</span><span class="p">).</span><span class="n">json</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+<span class="n">runner_registry</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">'GET'</span><span class="p">,</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">runner_discovery_uri</span><span class="p">,</span> <span class="s">'algorithms'</span><span class="p">)).</span><span class="n">json</span><span class="p">()</span>
 </code></pre></div></div>
 
 <p>If we tweak format of messages sent to the queue to include the name of an algorithm to run alongisde the data to run it on, then the algorithm name can be used to get the corresponding runner host that supports that algorithm by reading <code class="language-plaintext highlighter-rouge">runner_registry</code>. If <code class="language-plaintext highlighter-rouge">algorithm</code> is the field in the queue message’s <code class="language-plaintext highlighter-rouge">body</code> that gives us that name and <code class="language-plaintext highlighter-rouge">payload</code> is the field with the data to run it on (compliant with the runner’s algorithm handler arguments as defined in its <code class="language-plaintext highlighter-rouge">runner_adapter</code>), then the following bit of code gets us home:</p>
@@ -378,11 +380,57 @@ for name, handler in handlers_by_algorithm.items():
 
 <h3 id="trying-it-out">Trying it out</h3>
 
+<p>Let’s run the same example as in the previous article, just to replicate the same usage and see that it still works.</p>
+
+<p>First, selecting a few logs line from the initialization to see how it’s looking now. We can see the interactions between the runner looking for handlers in the runner’s adapter module, registering them and the controller discovering them by querying the Discovery component.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter...
+meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
+meme-classifier-runner    | INFO :: [Discovery] :: Found handlers: run_meme_classifier
+meme-classifier-runner    | INFO :: [Discovery] :: Registering algorithm meme_classifier
+runner-discovery          | INFO:     172.19.0.5:48300 - "GET /algorithms HTTP/1.1" 200 OK
+controller                | INFO :: Obtained runner registry: {'meme_classifier': 'http://meme-classifier-runner:5000'}
+...
+controller                | INFO :: [+] Listening for messages on queue tasks
+</code></pre></div></div>
+
+<p>From a terminal at <code class="language-plaintext highlighter-rouge">./producer/</code>:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python main.py <span class="se">\</span>
+meme_classifier <span class="se">\</span>
+<span class="s1">'{"image_url": "https://memegenerator.net/img/instances/39673831.jpg"}'</span>
+</code></pre></div></div>
+
+<p>Note now the helper script at <code class="language-plaintext highlighter-rouge">./producer/main.py</code> takes an algorithm name as argument as well, since our environment now supports running multiple algorithms and, as we covered before, the message format expected by the controller now includes this parameter.</p>
+
+<p>Logs after sending the message:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller                | INFO :: Received message {'algorithm': 'meme_classifier', 'payload': {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}}
+controller                | INFO :: Calling runner on http://meme-classifier-runner:5000/run/meme_classifier
+meme-classifier-runner    | INFO :: [Server] :: Received request to run algorithm SupportedAlgorithm.meme_classifier on payload {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}
+meme-classifier-runner    | INFO:     172.19.0.5:50060 - "POST /run/meme_classifier HTTP/1.1" 200 OK
+controller                | INFO :: Received result from runner: {'result': {'label': 'matrix_morpheus', 'score': 0.99998}}
+</code></pre></div></div>
+
+<p>Note the controller sends its request for a run of the meme classifier at <code class="language-plaintext highlighter-rouge">http://meme-classifier-runner:5000</code> which is the URI it received before from the Discovery Runner when sending <code class="language-plaintext highlighter-rouge">GET /algorithms</code> to it.</p>
+
 <h2 id="so-is-it-really-that-extensible">So, is it really that extensible?</h2>
+
+<p>We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.</p>
+
+<p>You might remember that, in Part I, we motivated designing the pattern by the example of a fictitious image board company that decided it needed to run a meme classifier on images posted to i by users. So to make the test a bit more elegant, let’s actually add some algorithms in the same vain.</p>
 
 <h3 id="adding-a-new-algorithm-to-an-existing-runner-container">Adding a new algorithm to an existing runner container</h3>
 
+<p>Se agrega OCR.</p>
+
+<p>… código, todo nice</p>
+
 <h3 id="adding-a-new-runner-container">Adding a new runner container</h3>
+
+<p>Ahora se agrega detección de idioma, va en otro container porque es otro repo nuevo todo NLP</p>
+
+<h2 id="bonus">Bonus</h2>
+
+<p>La generación dinámica de modelos permite documentación, mostrar script para obtener schemas de runners y cómo quedan los schemas.</p>
 
 <h2 id="conclusions">Conclusions</h2>
 
