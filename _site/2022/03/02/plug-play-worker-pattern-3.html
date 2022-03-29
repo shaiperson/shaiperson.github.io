@@ -9,17 +9,17 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
-<link rel="canonical" href="http://localhost:4000/2022/03/02/plug-play-worker-pattern-3.html" />
-<meta property="og:url" content="http://localhost:4000/2022/03/02/plug-play-worker-pattern-3.html" />
+<link rel="canonical" href="/2022/03/02/plug-play-worker-pattern-3.html" />
+<meta property="og:url" content="/2022/03/02/plug-play-worker-pattern-3.html" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-03-02T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part III" />
 <script type="application/ld+json">
-{"datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/02/plug-play-worker-pattern-3.html"},"url":"http://localhost:4000/2022/03/02/plug-play-worker-pattern-3.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part III","dateModified":"2022-03-02T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/02/plug-play-worker-pattern-3.html"},"url":"/2022/03/02/plug-play-worker-pattern-3.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part III","dateModified":"2022-03-02T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
@@ -66,7 +66,7 @@
 
 <p>In Part I we developed the theory for the pattern, starting from an initial, naïve implementation of a worker environment that does not take extensibility into account, building all the way up to a pattern that attempts to optimize for that property. To also build up to the pattern in the technical realm, we implemented the initial design in Part II to use as a basis for implementing the final design.</p>
 
-<p>Here, in Part III, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and enjoy the fruits of our work!</p>
+<p>Here, in Part III, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and, hopefully, enjoy the fruits of our labor.</p>
 
 <h2 id="implementation">Implementation</h2>
 
@@ -74,7 +74,7 @@
 
 <p><img src="/assets/plug-play-worker-pattern-part-1/Untitled%203.png" style="display: block; margin-left: auto; margin-right: auto; width: 50%;" /></p>
 
-<p>We have a Runner Discovery component responsible for holding a registry of supported algorithms that allows the Controller to discover them. In turn, the “Runner” components have the capacity of running algorithms. They first register with the Discovery component and then listen for algorithm requests over HTTP that the Controller can send when it’s ready. As you can tell, the order of initialization clearly matters. The numbers in the diagram denote this order:</p>
+<p>We have a Runner Discovery component responsible for holding a registry of supported algorithms. This registry is what allows the Controller to discover them. In turn, the “Runner” components have the capacity of running algorithms. They first register with the Discovery component and then listen for algorithm requests over HTTP that the Controller can send when it’s ready to. As you can tell, the order of initialization clearly matters. The numbers in the diagram denote this order:</p>
 
 <ol>
   <li>Runner Discovery initializes.</li>
@@ -83,20 +83,20 @@
   <li>Controller sends algorithm requests to runners until work is done.</li>
 </ol>
 
-<p>Now, let’s go ahead and apply this pattern to our worker environment from the previous article. We’ll start with the Runner Discovery, which is both the only brand-new element in our environment and the first one to initialize. Then, we’ll look at how to adapt our runner component to the component. Last, we’ll extend the controller with the necessary code to have it discover the runners automatically.</p>
+<p>Now, let’s go ahead and apply this pattern to our worker environment from the previous article. We’ll start with the Runner Discovery, which is both the only brand-new element in our environment and the first one to initialize. Then, we’ll look at how to adapt our runner component to the pattern. Last, we’ll extend the controller with the necessary code to have it discover the runners automatically.</p>
 
 <h4 id="general-note">General note</h4>
 
 <p>As we did in the previous article when implementing our naïve setup, we’ll Dockerize each component that goes into our worker environment and run all of them in concert using Docker Compose. To make it all work, there are a number of configuration parameters that need to be correctly set in each container of the setup, and we’ll take care to make all of these configurable by environment variables. In each Python projects that requires it, we’ll use the convention of creating a <code class="language-plaintext highlighter-rouge">settings</code> module that picks up all relevant environment variables, validates them and exposes them to other modules.</p>
 
-<p>Similarly to the previous article, we’ll implement everything here in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example this GitHub repo. Code for the complete pattern presented here is available in branch <code class="language-plaintext highlighter-rouge">pattern</code>. The code for all components is placed in a single repository. Looking at the repo, you’ll find a directory for each component with its source files, Dockerfile and a <code class="language-plaintext highlighter-rouge">build.sh</code> script. The <code class="language-plaintext highlighter-rouge">worker</code> and <code class="language-plaintext highlighter-rouge">producer</code> directories are there to assist in running and testing everything locally.</p>
+<p>Similarly to the previous article, we’ll code everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example <a href="https://github.com/shaiperson/worker-pattern-article">this GitHub repo</a>. Code for the complete pattern first presented here is available in branch <code class="language-plaintext highlighter-rouge">pattern</code>. Code for the complete pattern plus the example algorithms we used to extend it with is available in branch <code class="language-plaintext highlighter-rouge">pattern-extended</code>. This single repository includes all the code, and in it you’ll find a directory for each component with its source files, Dockerfile and a <code class="language-plaintext highlighter-rouge">build.sh</code> script. The <code class="language-plaintext highlighter-rouge">worker</code> and <code class="language-plaintext highlighter-rouge">producer</code> directories are there to assist in running and testing everything locally.</p>
 
 <h3 id="runner-discovery">Runner Discovery</h3>
 
-<p>This component has a simple, single responsibility: to function as a discovery service for runners and algorithms. As such, it’ll be a server application exposing a simple API for registering discoverable componentes and reading them. This means it has to:</p>
+<p>This component has a single, simple responsibility: to function as a discovery service for runners and algorithms. As such, it’ll be a server application exposing a simple API for registering discoverable componentes and reading them. This means it has to:</p>
 
 <ol>
-  <li>Provide an endpoint for runners to register themselves and the algorithms they support on.</li>
+  <li>Provide an endpoint for runners to register themselves on along with the algorithms they can run.</li>
   <li>Provide an endpoint for the controller to discover runners on when it needs to.</li>
 </ol>
 
@@ -114,7 +114,7 @@
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div></div>
 
-<p>The API allows runners to <code class="language-plaintext highlighter-rouge">POST</code> these <code class="language-plaintext highlighter-rouge">{algorithm, host}</code> pairs for the Discovery component to store in its registry, and to <code class="language-plaintext highlighter-rouge">GET</code> the registry so that the controller learns on which host it can find each algorithm.</p>
+<p>The API allows runners to <code class="language-plaintext highlighter-rouge">POST</code> these <code class="language-plaintext highlighter-rouge">{algorithm, host}</code> pairs for the Discovery component to store in its registry, and it also allows to <code class="language-plaintext highlighter-rouge">GET</code> the registry so that the controller can learn on which host it can find each algorithm.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
 
@@ -132,35 +132,36 @@
 
 <h3 id="extending-the-runners">Extending the runners</h3>
 
-<p>As we’ve seen, to adapt the runner components to this pattern they now need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.</p>
+<p>As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.</p>
 
-<p>As we hinted at in Part I when going over the pattern’s theory, the only way we can really make a setup such as this easy enough to develop and maintain is to <em>single-source</em> those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.</p>
+<p>Like we hinted at in Part I when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to <em>single-source</em> those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.</p>
 
-<p>Working with Python, the way we’ll do this is to develop a separate Python project that does all of the environment-related work. We’ll then package that project as a dependency that can be installed in each runner container using <code class="language-plaintext highlighter-rouge">pip</code>. This package will be called <code class="language-plaintext highlighter-rouge">runnerlib</code>.</p>
+<p>Working with Python, the way we’ll do this is to develop a separate Python project that takes care of all environment-related work. We’ll then package that project as a dependency that can be installed in each runner container using <code class="language-plaintext highlighter-rouge">pip</code>. This package will be called <code class="language-plaintext highlighter-rouge">runnerlib</code>.</p>
 
-<p>Also, by developing <code class="language-plaintext highlighter-rouge">runnerlib</code> separately, we can concentrate exclusively on algorithms whenever we’re working on a project responsible for algorithms. For this to work, however, we have to come up with some kind of convention that will make each project’s supported algorithms discoverable by <code class="language-plaintext highlighter-rouge">runnerlib</code> since, at build time, <code class="language-plaintext highlighter-rouge">runnerlib</code> will be naturally agnostic of the runner it will be packaged with in each case. We’ll outline such a convention for the runners to comply with presently.</p>
+<p>Also, by developing <code class="language-plaintext highlighter-rouge">runnerlib</code> separately, we can concentrate exclusively on algorithms whenever we’re working on a project responsible for algorithms. For this to work, however, we have to come up with some kind of convention that will make each project’s supported algorithms discoverable by <code class="language-plaintext highlighter-rouge">runnerlib</code> since, at build time, <code class="language-plaintext highlighter-rouge">runnerlib</code> will be naturally agnostic of the runner it’s packaged with in each case. We’ll outline such a convention for the runners to comply with presently.</p>
 
 <h4 id="environment-related-code">Environment-related code</h4>
 
 <p><strong>Discovery</strong></p>
 
-<p>As a first step in developing <code class="language-plaintext highlighter-rouge">runnerlib</code>, let’s create a <code class="language-plaintext highlighter-rouge">disocvery</code> module responsible for interacting with Runner Discovery. This module will expose a function, called <code class="language-plaintext highlighter-rouge">register_all</code>, that discovers the locally supported algorithms and sends registration requests for those algorithms to the Discovery component. This is where a convention for <code class="language-plaintext highlighter-rouge">runnerlib</code> and the runners to agree on becomes necessary: what can we do in our algorithm-running project to make its algorithms easy to discover by a library installed in the same Python environment?</p>
+<p>As a first step in developing <code class="language-plaintext highlighter-rouge">runnerlib</code>, let’s create a <code class="language-plaintext highlighter-rouge">disocvery</code> module responsible for interacting with Runner Discovery. This module will expose a function, called <code class="language-plaintext highlighter-rouge">register_all</code>, that discovers the locally supported algorithms and sends registration requests for those algorithms to the Discovery component. This is where a convention for <code class="language-plaintext highlighter-rouge">runnerlib</code> and the runners to agree on becomes necessary: what can we do in our algorithm-running project to make its algorithms easy to discover by an external package?</p>
 
-<p>There are many ways to go about this, but let’s just go with one. This is the convention:</p>
+<p>There are many ways to go about this, but let’s just go with one. This is the convention, which we dub the <em>adapter convention</em>:</p>
 
 <ol>
   <li>Each runner project sports a module called <code class="language-plaintext highlighter-rouge">runner_adapter</code>.</li>
-  <li>The <code class="language-plaintext highlighter-rouge">runner_adapter</code> module in each runner exposes one handler function per supported algorithm.</li>
-  <li>The name of each handler function is <code class="language-plaintext highlighter-rouge">run_{algorithm-name}</code>.</li>
-  <li>The arguments for each handler function are sufficient to run its associated algorithm, are specified with type hints and all types convertible from JSON.</li>
-  <li>The return value from each handler is sufficient in capturing the result for the algorithm run and it’s convertible to JSON.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">runner_adapter</code> module in each runner exposes one handler function per supported algorithm named <code class="language-plaintext highlighter-rouge">run_{algorithm-name}</code>.</li>
+  <li>The arguments for each handler function are sufficient to run its associated algorithm, are specified with type hints and all those types are compatible with JSON.</li>
+  <li>The return value from each handler is sufficient in capturing the result for the algorithm run and is compatible with JSON.</li>
 </ol>
 
-<p>The first three requirements allow <code class="language-plaintext highlighter-rouge">runnerlib</code>’s <code class="language-plaintext highlighter-rouge">discovery</code> module to discover the algorithms and the Python functions by which it can run them on data. The fourth requirement allows it to create Pydantic models for each function to use for validation on payloads sent in algorithm-running requests from the Controller. Creating these models with Pydantic also enables easily generating documentation for them. The fifth and last requirement serves to simplify generating the server’s response to each request. In this way, the <code class="language-plaintext highlighter-rouge">runner_adapter</code> serves to interface between the environment-related operations upstream from it and the logic of running and computing algorithm results downstream from it. If any conversions need to be made on what’s returned from downstream algorithm code, they can be made in the adapter to yield a result that complies with this contract.</p>
+<p>The first two requirements of the adapter convention allow <code class="language-plaintext highlighter-rouge">runnerlib</code>’s <code class="language-plaintext highlighter-rouge">discovery</code> module to discover the algorithms and the Python functions by which it can run them on data. The third requirement allows it to create Pydantic models for each function to use for validation on payloads sent in algorithm-running requests from the Controller. Creating these models with Pydantic also enables easily generating documentation for them. The fourth and final requirement serves to simplify generating the server’s response to each request, and can be also used to dynamically create Pydantic models for return values.</p>
 
-<p>We’re now ready to code the <code class="language-plaintext highlighter-rouge">register_all</code> function. The function first imports the <code class="language-plaintext highlighter-rouge">runner_adapter</code> module that should be available to import once <code class="language-plaintext highlighter-rouge">runnerlib</code> is installed in a given runner container if the convention is complied with. It then uses <code class="language-plaintext highlighter-rouge">inspect</code> to pick up all <code class="language-plaintext highlighter-rouge">run_{algorithm-name}</code> functions and map each algorithm name to its handler in the <code class="language-plaintext highlighter-rouge">handlers_by_algorithm</code> dict. Finally, it sends <code class="language-plaintext highlighter-rouge">POST</code>s each algorithm to the Discovery component along with the runner’s URI available to it at <code class="language-plaintext highlighter-rouge">settings.host</code>.</p>
+<p>In this way, the <code class="language-plaintext highlighter-rouge">runner_adapter</code> serves to interface between the environment-related operations upstream of it and the logic of running and computing algorithm results downstream of it. If any conversions need to be made on what’s passed from upstream environment code or returned from downstream algorithm code, they can be made in the adapter to compute and yield a result that complies with this adapter contract.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">inspect</span>
+<p>We’re now ready to code the <code class="language-plaintext highlighter-rouge">register_all</code> function. The function first imports the <code class="language-plaintext highlighter-rouge">runner_adapter</code> module that should be available to import once <code class="language-plaintext highlighter-rouge">runnerlib</code> is installed in a given runner container if the adapter convention is followed. It then uses <code class="language-plaintext highlighter-rouge">inspect</code> to pick up all <code class="language-plaintext highlighter-rouge">run_{algorithm-name}</code> functions, parse out each algorithm name and map it to its handler in the <code class="language-plaintext highlighter-rouge">handlers_by_algorithm</code> dict. Finally, it <code class="language-plaintext highlighter-rouge">POST</code>s each algorithm to the Discovery component along with the runner’s URI available to it at <code class="language-plaintext highlighter-rouge">settings.host</code>.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># discovery.py
+</span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
 
@@ -200,12 +201,13 @@
 
 <p>The other environment-related responsibility <code class="language-plaintext highlighter-rouge">runnerlib</code> has to endow our runners with is to spin up a server for the Controller to hit with algorithm-running requests.</p>
 
-<p>As we hinted at before, we can dynamically create Pydantic models for each handler’s expected arguments by using inspection. This is done with Pydantic’s <code class="language-plaintext highlighter-rouge">create_model</code> function that let’s us create a model with fields and types only known at runtime. Because at runtime we know what algorithms our current runner supports, we can also create a Pydantic model to validate the requested algorithm itself is supported. This can be done very comfortably by using FastAPI and defining the algorithm as a path parameter of that Pydantic model’s type.</p>
+<p>As we suggested before, we can dynamically create Pydantic models for each handler’s expected arguments. This is done on the hone hand by using inspection to get a handler’s arguments, and on the other using Pydantic’s <code class="language-plaintext highlighter-rouge">create_model</code> function that lets us create a model with fields and types only known at runtime. Because at runtime we know what algorithms our current runner supports, we can also create a Pydantic model to validate the requested algorithm itself is supported. This can be done very comfortably by using FastAPI and defining the algorithm as a path parameter of that Pydantic model’s type.</p>
 
 <p>Let’s first go over the dynamic model creation, implemented in a <code class="language-plaintext highlighter-rouge">models</code> module.</p>
 
-<p>First some imports, and the declaration of a variable that’ll be used by the server code to get the relevant models organized by algorithm. Note that, in particular, we also import <code class="language-plaintext highlighter-rouge">discovery</code>’s <code class="language-plaintext highlighter-rouge">handlers_by_algorithm</code> both to get the set of supported algorithms and because it’s by inspecting these handlers that we can tell what arguments they expect.</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">inspect</span>
+<p>First some imports, and the declaration of a variable that’ll be used by the server code to get the relevant models indexed by algorithm. Note that, in particular, we also import <code class="language-plaintext highlighter-rouge">discovery</code>’s <code class="language-plaintext highlighter-rouge">handlers_by_algorithm</code> both to get the set of supported algorithms and because it’s by inspecting these handlers that we can tell what arguments they expect.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># models.py
+</span><span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">create_model</span><span class="p">,</span> <span class="n">Extra</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
@@ -215,7 +217,7 @@
 <span class="n">request_models_by_algorithm</span> <span class="o">=</span> <span class="p">{}</span>
 </code></pre></div></div>
 
-<p>We loop over supported algorithms, inspect each handler and generate a Pydantic model dynamically. We also populate a list of algorithm names to use</p>
+<p>We loop over supported algorithms, inspect each handler and generate a Pydantic model dynamically.</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class Config:
     extra = Extra.forbid
 
@@ -231,19 +233,17 @@ for name, handler in handlers_by_algorithm.items():
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SupportedAlgorithm</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s">'SupportedAlgorithm'</span><span class="p">,</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">handlers_by_algorithm</span><span class="p">})</span>
 </code></pre></div></div>
 
-<p>As a nice bonus, we can add a function in this module that returns the schemas for the generated modules. This can be used to get a quick view of the payloads expected by runners and their algorithm request handlers and create documentation.</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_schemas</span><span class="p">():</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">model</span><span class="p">.</span><span class="n">schema</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">request_models_by_algorithm</span><span class="p">.</span><span class="n">items</span><span class="p">()}</span>
-</code></pre></div></div>
+<p>As a nice bonus, we can use the information in this module to get JSON schemas for the generated models. This can be used to get a quick view of the payloads expected by runners and their algorithm request handlers and create documentation. We’ll come back to this towards the end of the article.</p>
 
 <p><strong>Server</strong></p>
 
 <p>Now, to the server itself.</p>
 
-<p>Aside from server-related dependencies, we import from <code class="language-plaintext highlighter-rouge">models</code> everything we need to run validation in our API as discussed above, and <code class="language-plaintext highlighter-rouge">discovery</code>’s <code class="language-plaintext highlighter-rouge">get_handler</code> that, for each supported algorithm that’s requested, will get us it’s corresponding handler exposed in <code class="language-plaintext highlighter-rouge">runner_adapter</code>.</p>
+<p>Aside from server-related dependencies, we import from <code class="language-plaintext highlighter-rouge">models</code> everything we need to run validation in our API as discussed above, and <code class="language-plaintext highlighter-rouge">discovery</code>’s <code class="language-plaintext highlighter-rouge">get_handler</code> that, for each supported algorithm that’s requested, will get us its corresponding handler exposed in <code class="language-plaintext highlighter-rouge">runner_adapter</code>.</p>
 
-<p>We define a single <code class="language-plaintext highlighter-rouge">POST</code> endpoint that takes the algorithm to run as a path parameter, and a body that must correspond to that algorithm’s handler’s arguments as defined in <code class="language-plaintext highlighter-rouge">runner_adapter</code>. FastAPI will validate that the algorithm is supported by having declared <code class="language-plaintext highlighter-rouge">algorithm</code> as a path parameter of type <code class="language-plaintext highlighter-rouge">SupportedAlgorithm</code>, and then inside our path operation function we run validation of the body against the model we generated dynamically for the requested algorithm, found in <code class="language-plaintext highlighter-rouge">request_models_by_algorithm</code> exposed by <code class="language-plaintext highlighter-rouge">models</code>. If validation passes, we just invoke the handler passing it the body’s content as arguments and return the result, which will be successfully converted to JSON by FastAPI if the convention from before was followed in coding the container’s <code class="language-plaintext highlighter-rouge">runner_adapter</code>. As in the previous article, <code class="language-plaintext highlighter-rouge">exceptions</code> is a local module defining expected exceptions in our application (find it in the repo).</p>
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">traceback</span>
+<p>We define a single <code class="language-plaintext highlighter-rouge">POST</code> endpoint that takes the algorithm to run as a path parameter, and a body that must correspond to that algorithm’s handler’s arguments as defined in <code class="language-plaintext highlighter-rouge">runner_adapter</code>. We ensure FastAPI will validate that the algorithm is supported by having declared <code class="language-plaintext highlighter-rouge">algorithm</code> as a path parameter of type <code class="language-plaintext highlighter-rouge">SupportedAlgorithm</code>, and then inside our path operation function we run validation of the body against the model we dynamically created for the requested algorithm found in <code class="language-plaintext highlighter-rouge">models</code>’s <code class="language-plaintext highlighter-rouge">request_models_by_algorithm</code>. If validation passes, we just invoke the handler passing it the body’s content as arguments and return the result, which will be successfully converted to JSON by FastAPI if the adapter convention is followed in the container’s <code class="language-plaintext highlighter-rouge">runner_adapter</code>. As in the previous article, <code class="language-plaintext highlighter-rouge">exceptions</code> is an auxiliary module defining expected exceptions in our application (find it in the repo). This time though, it’s packaged with <code class="language-plaintext highlighter-rouge">runnerlib</code> as it’s needed there and can be useful in any runner.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># server.py
+</span><span class="kn">import</span> <span class="nn">traceback</span>
 
 <span class="kn">import</span> <span class="nn">uvicorn</span>
 <span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span>
@@ -282,9 +282,10 @@ for name, handler in handlers_by_algorithm.items():
 
 <p><strong>Top-level code</strong></p>
 
-<p>Lastly, since all these environment-related concerns essentially make up the initialization process of a runner container, in the Docker command in each runner container we’ll actually run <code class="language-plaintext highlighter-rouge">runnerlib</code> as a top-level module. This means we code the runner’s initialization in <code class="language-plaintext highlighter-rouge">runnerlib</code>’s <code class="language-plaintext highlighter-rouge">__main__</code> module:</p>
+<p>Lastly, since all these environment-related concerns essentially make up the initialization process of a runner container, it’s actually <code class="language-plaintext highlighter-rouge">runnerlib</code> that we’ll run as a top-level module as the Docker command in each runner container. This means we code the runner initialization logic in <code class="language-plaintext highlighter-rouge">runnerlib</code>’s <code class="language-plaintext highlighter-rouge">__main__</code> module:</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">.discovery</span> <span class="kn">import</span> <span class="n">register_all</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># __main__.py
+</span><span class="kn">from</span> <span class="nn">.discovery</span> <span class="kn">import</span> <span class="n">register_all</span>
 <span class="n">register_all</span><span class="p">()</span>
 
 <span class="kn">from</span> <span class="nn">.server</span> <span class="kn">import</span> <span class="n">run_server</span>
@@ -293,11 +294,12 @@ for name, handler in handlers_by_algorithm.items():
 
 <p>Upon running <code class="language-plaintext highlighter-rouge">python -m runnerlib</code> in a runner container, that runner’s algorithms will get registered with the Discovery component, and it’ll be listening for algorithm-running requests.</p>
 
-<h4 id="complying-with-the-convention">Complying with the convention</h4>
+<h4 id="complying-with-the-adapter-convention">Complying with the adapter convention</h4>
 
-<p>To comply with the convention we came up with for runners to integrate with <code class="language-plaintext highlighter-rouge">runnerlib</code>, we just need to create a <code class="language-plaintext highlighter-rouge">runner_adapter</code> module in each algorithm-running project. By following the five requirements we outlined before, we get the following very simple module code. The algorithm name being <code class="language-plaintext highlighter-rouge">meme_classifier</code>, we define a <code class="language-plaintext highlighter-rouge">run_meme_classifier</code> handler function with a JSON-friendly argument in <code class="language-plaintext highlighter-rouge">image_url</code> that is enough to run the algorithm and a result that upstream concerns can convert to JSON. This handler calls the <code class="language-plaintext highlighter-rouge">run_on_url</code> function we saw in Part II, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.</p>
+<p>To comply with the convention we came up with for runners to integrate with <code class="language-plaintext highlighter-rouge">runnerlib</code>, we just need to create a <code class="language-plaintext highlighter-rouge">runner_adapter</code> module in each algorithm-running project. By following the convention’s four requirements, we get the following very simple module code. The algorithm name being <code class="language-plaintext highlighter-rouge">meme_classifier</code>, we define a <code class="language-plaintext highlighter-rouge">run_meme_classifier</code> handler function with a JSON-friendly argument in <code class="language-plaintext highlighter-rouge">image_url</code> that is enough to run the algorithm. We also return a result that upstream concerns can convert to JSON. This handler calls the <code class="language-plaintext highlighter-rouge">run_on_url</code> function we saw in Part II, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">classifier</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># runner_adapter.py
+</span><span class="kn">import</span> <span class="nn">classifier</span>
 
 <span class="k">def</span> <span class="nf">run_meme_classifier</span><span class="p">(</span><span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
     <span class="c1"># logger.info('Running classifier on URL'.format(image_url))
@@ -307,17 +309,19 @@ for name, handler in handlers_by_algorithm.items():
 
 <h4 id="packaging-runners-with-runnerlib">Packaging runners with <code class="language-plaintext highlighter-rouge">runnerlib</code></h4>
 
-<p>By installing <code class="language-plaintext highlighter-rouge">runnerlib</code> in a runner’s container, it’s available to run inside it as a top-level module. The command to run the container with is then simply <code class="language-plaintext highlighter-rouge">python -m runnerlib</code>. To install <code class="language-plaintext highlighter-rouge">runnerlib</code>, the Dockerfile I created in the repo simply copies the <code class="language-plaintext highlighter-rouge">runnerlib</code> code found inside the repo to the container image and runs <code class="language-plaintext highlighter-rouge">pip install</code> on it. There are many other ways to install an in-house Python package as a dependency in a container, and the best one will depend on development and CI/CD processes. Note that, in any case, <code class="language-plaintext highlighter-rouge">runnerlib</code> is single-sourced and thus can be developed in one single place, versioned separately and distributed easily to any number of runner containers using a single process.</p>
+<p>By installing <code class="language-plaintext highlighter-rouge">runnerlib</code> in a runner’s container, it’s available to run inside it as a top-level module. The command to run the container with then simply is <code class="language-plaintext highlighter-rouge">python -m runnerlib</code>.</p>
+
+<p>To install <code class="language-plaintext highlighter-rouge">runnerlib</code>, the Dockerfile in the repo I prepared for the article simply copies the <code class="language-plaintext highlighter-rouge">runnerlib</code> code found inside the repo to the container image and runs <code class="language-plaintext highlighter-rouge">pip install</code> on it. There are many other ways to install an in-house Python package as a dependency in a container, and the best one in each case will depend on development and CI/CD processes. Whatever the case may be, note that <code class="language-plaintext highlighter-rouge">runnerlib</code> is single-sourced and can therefore be developed in one single place, versioned separately and distributed easily to any number of runner containers using a single process.</p>
 
 <h3 id="extending-the-controller">Extending the controller</h3>
 
-<p>The only bit of code missing is to extend the Controller with some logic to get the runner registry from the Discovery component. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it and get a dictionary that maps algorithm names to local runner hosts.</p>
+<p>The only bit of code missing now is to extend the Controller with some logic to get the runner registry from the Runner Discovery. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it and get a dictionary that maps algorithm names to local runner URIs.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
 <span class="n">runner_registry</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">request</span><span class="p">(</span><span class="s">'GET'</span><span class="p">,</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">runner_discovery_uri</span><span class="p">,</span> <span class="s">'algorithms'</span><span class="p">)).</span><span class="n">json</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p>If we tweak format of messages sent to the queue to include the name of an algorithm to run alongisde the data to run it on, then the algorithm name can be used to get the corresponding runner host that supports that algorithm by reading <code class="language-plaintext highlighter-rouge">runner_registry</code>. If <code class="language-plaintext highlighter-rouge">algorithm</code> is the field in the queue message’s <code class="language-plaintext highlighter-rouge">body</code> that gives us that name and <code class="language-plaintext highlighter-rouge">payload</code> is the field with the data to run it on (compliant with the runner’s algorithm handler arguments as defined in its <code class="language-plaintext highlighter-rouge">runner_adapter</code>), then the following bit of code gets us home:</p>
+<p>If we tweak format of messages sent to the queue to include the name of an algorithm to run alongside the data to run it on, then the algorithm name can be used to get the corresponding runner host that supports that algorithm by reading <code class="language-plaintext highlighter-rouge">runner_registry</code>. If <code class="language-plaintext highlighter-rouge">algorithm</code> is the field in the queue message’s body that holds that name and <code class="language-plaintext highlighter-rouge">payload</code> is the field with the data to run it on (compliant with the runner’s algorithm handler arguments as defined in its <code class="language-plaintext highlighter-rouge">runner_adapter</code>), then the following bit of code gets us home:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">json</span>
 
@@ -332,14 +336,14 @@ for name, handler in handlers_by_algorithm.items():
 
 <h3 id="dockerization-compose-file">Dockerization, Compose File</h3>
 
-<p>Not much changes in the Dockerfiles we already went over in the Part II, save an addition to the runner’s that installs <code class="language-plaintext highlighter-rouge">runnerlib</code>:</p>
+<p>Not much changes in the Dockerfiles we already went over in the Part II, save an addition to the runner’s that installs <code class="language-plaintext highlighter-rouge">runnerlib</code>. Note the context from which we run the build is now at the repo’s top level where it can reach both the runner code and <code class="language-plaintext highlighter-rouge">runnerlib</code>’s code.</p>
 
 <div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">COPY</span><span class="s"> ./runnerlib /opt/lib/runnerlib</span>
 <span class="k">WORKDIR</span><span class="s"> /opt/lib/runnerlib</span>
 <span class="k">RUN </span>pip <span class="nb">install</span> .
 </code></pre></div></div>
 
-<p>As for our brand new Discovery component, its Dockerfile is pretty straightforward as well. The requirements are all to do with setting up its server using FastAPI.</p>
+<p>As for our shiny new Discovery component, its Dockerfile is pretty straightforward as well. In particular, the dependencies in <code class="language-plaintext highlighter-rouge">requirements.txt</code> are all to do with setting up its server using FastAPI.</p>
 <div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> python:3.7</span>
 <span class="k">WORKDIR</span><span class="s"> /opt/project</span>
 <span class="k">COPY</span><span class="s"> requirements.txt .</span>
@@ -347,9 +351,9 @@ for name, handler in handlers_by_algorithm.items():
 <span class="k">COPY</span><span class="s"> ./* ./</span>
 </code></pre></div></div>
 
-<p>In turn, the Compose file we use to run and test out our environment gets a new service specification for Discovery Runner and some new environment variables to serve as configuration paramteres. The important additions in the way of configurability have to do with the discovery mechanism we designed. We now have to pass Runner Discovery’s URI to the Controller and runner so that they can communicate with it, and we have to make the runner container know its container name so it can pass it to Runner Discovery when it registers.</p>
+<p>In turn, the Compose file we use to run and test out our environment gets a new service specification for Discovery Runner and some new environment variables to serve as configuration paramteres. The important additions in the way of configurability have to do with the pattern’s discovery mechanism. We now have to pass Runner Discovery’s URI to the Controller and runner so that they can communicate with it, and we have to make the runner container know its container name so that it can pass it to Runner Discovery when it registers.</p>
 
-<p>As a nice bonus, while we’re updating the Compose file, we can also map the runner container’s port to a host port. This will enable access to its running FastAPI application’s automatically generated <code class="language-plaintext highlighter-rouge">/docs</code> endpoint to get us a useful quick and human-friendly look at its supported algorithms, in addition to the more complete JSON Schema specs we can get by running the <code class="language-plaintext highlighter-rouge">get_schemas</code> function from the runner’s <code class="language-plaintext highlighter-rouge">models</code> module manually.</p>
+<p>To briefly touch here on the nice bonus we mentioned before, we can also map the runner container’s port to a host port in the Compose file to enable us access to its running FastAPI application from the host machine. By being able to reach it, we can both hit the <code class="language-plaintext highlighter-rouge">/docs</code> endpoint automatically created by FastAPI to get us a useful quick and human-friendly look at its supported algorithms, and we can also reach an additional endpoint we’ll set up to aid us in getting valuable information on supported algorithms very easily. We’ll set this up in a bit after adding some more algorithms to the mix.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">runner-discovery</span><span class="pi">:</span>
     <span class="na">container_name</span><span class="pi">:</span> <span class="s">runner-discovery</span>
@@ -380,9 +384,9 @@ for name, handler in handlers_by_algorithm.items():
 
 <h3 id="trying-it-out">Trying it out</h3>
 
-<p>Let’s run the same example as in the previous article, just to replicate the same usage and see that it still works.</p>
+<p>Let’s run the same example as in Part II, just to replicate the same usage and see that it still works.</p>
 
-<p>First, selecting a few logs line from the initialization to see how it’s looking now. We can see the interactions between the runner looking for handlers in the runner’s adapter module, registering them and the controller discovering them by querying the Discovery component.</p>
+<p>First, here are a few logs line from the environment initialization to see how it’s looking now. We can see the interactions between the runner looking for algorithm handlers in the runner’s adapter module, the runner registering the algorithms it found and the controller discovering them by querying the Discovery component.</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
 meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter...
 meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
@@ -400,64 +404,296 @@ meme_classifier <span class="se">\</span>
 <span class="s1">'{"image_url": "https://memegenerator.net/img/instances/39673831.jpg"}'</span>
 </code></pre></div></div>
 
-<p>Note now the helper script at <code class="language-plaintext highlighter-rouge">./producer/main.py</code> takes an algorithm name as argument as well, since our environment now supports running multiple algorithms and, as we covered before, the message format expected by the controller now includes this parameter.</p>
+<p>Note that now the helper script at <code class="language-plaintext highlighter-rouge">./producer/main.py</code> takes an algorithm name as argument as well, since our environment now supports running multiple algorithms and, as we covered before, the message format expected by the controller now includes this parameter.</p>
 
 <p>Logs after sending the message:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller                | INFO :: Received message {'algorithm': 'meme_classifier', 'payload': {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}}
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller                | INFO :: Received message <span class="o">{</span><span class="s1">'algorithm'</span>: <span class="s1">'meme_classifier'</span>, <span class="s1">'payload'</span>: <span class="o">{</span><span class="s1">'image_url'</span>: <span class="s1">'https://memegenerator.net/img/instances/39673831.jpg'</span><span class="o">}}</span>
 controller                | INFO :: Calling runner on http://meme-classifier-runner:5000/run/meme_classifier
-meme-classifier-runner    | INFO :: [Server] :: Received request to run algorithm SupportedAlgorithm.meme_classifier on payload {'image_url': 'https://memegenerator.net/img/instances/39673831.jpg'}
-meme-classifier-runner    | INFO:     172.19.0.5:50060 - "POST /run/meme_classifier HTTP/1.1" 200 OK
-controller                | INFO :: Received result from runner: {'result': {'label': 'matrix_morpheus', 'score': 0.99998}}
+meme-classifier-runner    | INFO :: <span class="o">[</span>Server] :: Received request to run algorithm SupportedAlgorithm.meme_classifier on payload <span class="o">{</span><span class="s1">'image_url'</span>: <span class="s1">'https://memegenerator.net/img/instances/39673831.jpg'</span><span class="o">}</span>
+meme-classifier-runner    | INFO:     172.19.0.5:50060 - <span class="s2">"POST /run/meme_classifier HTTP/1.1"</span> 200 OK
+controller                | INFO :: Received result from runner: <span class="o">{</span><span class="s1">'result'</span>: <span class="o">{</span><span class="s1">'label'</span>: <span class="s1">'matrix_morpheus'</span>, <span class="s1">'score'</span>: 0.99998<span class="o">}}</span>
 </code></pre></div></div>
 
-<p>Note the controller sends its request for a run of the meme classifier at <code class="language-plaintext highlighter-rouge">http://meme-classifier-runner:5000</code> which is the URI it received before from the Discovery Runner when sending <code class="language-plaintext highlighter-rouge">GET /algorithms</code> to it.</p>
+<p>The controller sends its request for a run of the meme classifier at <code class="language-plaintext highlighter-rouge">http://meme-classifier-runner:5000</code> which is the URI it received previously from the Discovery Runner when sending a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it.</p>
 
 <h2 id="so-is-it-really-that-extensible">So, is it really that extensible?</h2>
 
 <p>We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.</p>
 
-<p>You might remember that, in Part I, we motivated designing the pattern by the example of a fictitious image board company that decided it needed to run a meme classifier on images posted to i by users. So to make the test a bit more elegant, let’s actually add some algorithms in the same vain.</p>
+<p>You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let’s actually add some algorithms in that same vain.</p>
 
 <h3 id="adding-a-new-algorithm-to-an-existing-runner-container">Adding a new algorithm to an existing runner container</h3>
 
-<p>Se agrega OCR.</p>
+<p>Our made-up company’s product team now decides that they also need the actual text content of meme images to get the insights they need into user behavior on the platform. In order to get them this information, we can incorporate OCR into our worker environment.</p>
 
-<p>… código, todo nice</p>
+<h4 id="ocr-implementation">OCR implementation</h4>
 
-<h3 id="adding-a-new-runner-container">Adding a new runner container</h3>
+<p>For that, we’ll use Google’s <a href="https://github.com/tesseract-ocr/tesseract">Tesseract OCR</a> through its Python wrapper <a href="https://pypi.org/project/pytesseract/"><code class="language-plaintext highlighter-rouge">pytesseract</code></a>. Tesseract works very well on images of documents but, out of the box and without any preprocessing on inputs, it behaves quite awkwardly when run on meme images. However, with some preprocessing on input images we can get some good results from it. We’ll base our implementation on this awesome <a href="https://towardsdatascience.com/extract-text-from-memes-with-python-opencv-tesseract-ocr-63c2ccd72b69">article</a> by <a href="https://medium.com/@egonferri">Egon Ferri</a> and <a href="https://medium.com/@lore.baiocco">Lorenzo Baiocco</a> that suggests some preprocessing operations and custom configuration for meme OCR with <code class="language-plaintext highlighter-rouge">pytesseract</code>.</p>
 
-<p>Ahora se agrega detección de idioma, va en otro container porque es otro repo nuevo todo NLP</p>
+<h4 id="adding-the-algorithm">Adding the algorithm</h4>
 
-<h2 id="bonus">Bonus</h2>
+<p>Let’s also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).</p>
 
-<p>La generación dinámica de modelos permite documentación, mostrar script para obtener schemas de runners y cómo quedan los schemas.</p>
+<p>So, all we have to do is to create an algorithm-running module and an algorithm request handler in the container’s <code class="language-plaintext highlighter-rouge">runner_adapter</code>. And that’s it! Once it’s listed in <code class="language-plaintext highlighter-rouge">runner_adapter</code>, our environment setup will automatically find it and make it discoverable by the Controller. Of course, if a new algorithm also has new dependencies, then those need to be added to the build process as well; however, this naturally is inevitable and will be necessary when extending an environment with new algorithms in virtually any way or using any pattern.</p>
 
-<h2 id="conclusions">Conclusions</h2>
+<p>It’s also worth noting that actually, strictly speaking, the only necessary step is the <code class="language-plaintext highlighter-rouge">runner_adapter</code> one, and if we’re comfortable fitting an algorithm’s entire code directly into the adapter, then that would be enough. However, for a cleaner and clearer separation of concerns, it’s better to have the <code class="language-plaintext highlighter-rouge">runner_adapter</code> handler call algorithm-running functions from algorithm-specific modules.</p>
 
-<ul>
-  <li>Desarrollamos <code class="language-plaintext highlighter-rouge">runner</code> como librería</li>
-  <li>El Dockerfile de cada runner va a tener “if prod then instalar de pip else copy e instalar local”</li>
-</ul>
+<p>With all of this in mind, we’ll create an <code class="language-plaintext highlighter-rouge">ocr</code> module in our existing runner project that exposes an algorithm-running function, a handler in the <code class="language-plaintext highlighter-rouge">runner_adapter</code> that invokes it and that is compliant with the adapter convention from before, and we’ll list the necessary updates to the runner’s build logic.</p>
 
-<p>Hicimos</p>
-<ul>
-  <li>Armar librería corrible como módulo</li>
-  <li>Hay que setearle PYTHONPATH para que encuentre el integration_adapter</li>
-  <li>Hay que setearle PORT</li>
-  <li>Hay que setearle CONTAINER_NAME</li>
-  <li>(ver cuáles env var más por las dudas)</li>
-  <li>Falta hacer el componente runner-discovery</li>
-  <li>Cuando corre:
-    <ul>
-      <li>Primero llama register
-        <ul>
-          <li>Register asume que hay handlers que empiezan con run_*</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li></li>
-</ul>
+<p><code class="language-plaintext highlighter-rouge">imgutils</code> is an auxiliary module defined locally.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># ocr.py
+</span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">pytesseract</span>
+
+<span class="kn">import</span> <span class="nn">imgutils</span>
+</code></pre></div></div>
+
+<p>Preprocessing suggested by the mentioned article to make a meme image more document-like (see example images in the mentioned <a href="https://towardsdatascience.com/extract-text-from-memes-with-python-opencv-tesseract-ocr-63c2ccd72b69">article</a>).</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">preprocess_final</span><span class="p">(</span><span class="n">im</span><span class="p">):</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="n">bilateralFilter</span><span class="p">(</span><span class="n">im</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cv2</span><span class="p">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">im</span> <span class="o">=</span> <span class="n">cv2</span><span class="p">.</span><span class="n">threshold</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">im</span>
+</code></pre></div></div>
+
+<p>The function we expose to run OCR on URLs, similarly to what we’ve done for our meme classifier previously.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_on_url</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="s">'Fetching image'</span><span class="p">)</span>
+    <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">imgutils</span><span class="p">.</span><span class="n">get_image_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="n">img_np</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">Image</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">))</span>
+    <span class="n">img_preprocessed</span> <span class="o">=</span> <span class="n">preprocess_final</span><span class="p">(</span><span class="n">img_np</span><span class="p">)</span>
+
+    <span class="n">custom_config</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"--oem 3 --psm 11 -c tessedit_char_whitelist= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ '"</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">pytesseract</span><span class="p">.</span><span class="n">image_to_string</span><span class="p">(</span><span class="n">img_preprocessed</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s">'eng'</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">custom_config</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>A very simple addition to <code class="language-plaintext highlighter-rouge">runner_adapter</code>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># runner_adapter.py
+</span><span class="k">def</span> <span class="nf">run_ocr</span><span class="p">(</span><span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s">'Running OCR on URL'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">image_url</span><span class="p">))</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">ocr</span><span class="p">.</span><span class="n">run_on_url</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>We make the following additions to <code class="language-plaintext highlighter-rouge">requirements.txt</code>:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">pytesseract</span><span class="o">==</span>0.3.9
+opencv-python-headless<span class="o">==</span>4.5.5.64
+</code></pre></div></div>
+
+<p>And to our Dockerfile:</p>
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Install Tesseract engine</span>
+<span class="k">RUN </span>apt-get update
+<span class="k">RUN </span>apt-get <span class="nt">-y</span> <span class="nb">install </span>tesseract-ocr
+</code></pre></div></div>
+
+<h4 id="trying-out-the-extension">Trying out the extension</h4>
+
+<p>A few log line from the environment as it initializes:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
+meme-classifier-runner    | INFO :: [Discovery] :: Found handlers: run_meme_classifier, run_ocr
+meme-classifier-runner    | INFO :: [Discovery] :: Registering algorithm meme_classifier
+runner-discovery          | INFO:     172.19.0.5:46642 - "POST /algorithms HTTP/1.1" 200 OK
+meme-classifier-runner    | INFO :: [Discovery] :: Registering algorithm ocr
+runner-discovery          | INFO:     172.19.0.5:46644 - "POST /algorithms HTTP/1.1" 200 OK
+controller                | INFO :: Requesting runner registry
+runner-discovery          | INFO:     172.19.0.6:59504 - "GET /algorithms HTTP/1.1" 200 OK
+controller                | INFO :: Obtained runner registry: {'meme_classifier': 'http://meme-classifier-runner:5000', 'ocr': 'http://meme-classifier-runner:5000'}
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ocr</code> has joined the party, and we can see the process by which it registers and how it now appears in the registry the Controller gets from Runner Discovery.</p>
+
+<p>Let’s run it on the same image:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python main.py ocr <span class="s1">'{"image_url": "https://memegenerator.net/img/instances/39673831.jpg"}'</span>
+</code></pre></div></div>
+<p>Environment logs:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller                | INFO :: Received message <span class="o">{</span><span class="s1">'algorithm'</span>: <span class="s1">'ocr'</span>, <span class="s1">'payload'</span>: <span class="o">{</span><span class="s1">'image_url'</span>: <span class="s1">'https://memegenerator.net/img/instances/39673831.jpg'</span><span class="o">}}</span>
+controller                | INFO :: Calling runner on http://meme-classifier-runner:5000/run/ocr
+meme-classifier-runner    | INFO :: <span class="o">[</span>Server] :: Received request to run algorithm SupportedAlgorithm.ocr on payload <span class="o">{</span><span class="s1">'image_url'</span>: <span class="s1">'https://memegenerator.net/img/instances/39673831.jpg'</span><span class="o">}</span>
+meme-classifier-runner    | INFO :: <span class="o">[</span>Adapter] :: Running OCR on URL
+meme-classifier-runner    | INFO:     172.19.0.6:57630 - <span class="s2">"POST /run/ocr HTTP/1.1"</span> 200 OK
+controller                | INFO :: Received result from runner: <span class="o">{</span><span class="s1">'result'</span>: <span class="s1">'WHAT IF 1 TOLDYOUTHAVE NO IDEA HOW MY GLASSESDONT FALL OUT'</span><span class="o">}</span>
+</code></pre></div></div>
+
+<p>The request gets sent to the correct endpoint successfully obtained from the registry.</p>
+
+<h3 id="adding-an-algorithm-in-a-new-runner-container">Adding an algorithm in a new runner container</h3>
+
+<p>Now, after some more data gathering and analysis, our fictitious product team further realizes that they’re missing a key piece to give them insight on user behavior: they wish to know the language of the text in each meme image. To do this, we can add a language detection algorithm to our setup.</p>
+
+<p>In this case, let’s assume we have an ML team that actually starts developing a battery of NLP algorithms, and these are all sourced and versioned in a separate project dedicated to NLP. In that case, since we’re delivered this code as a standalone project, it’ll be the most natural to add a new runner container for it in our setup.</p>
+
+<p>To integrate this new runner, the only requirements it needs to satisfy are:</p>
+<ol>
+  <li>To be packaged in a Docker image with <code class="language-plaintext highlighter-rouge">runnerlib</code></li>
+  <li>To expose a compliant <code class="language-plaintext highlighter-rouge">runner_adapter</code>.</li>
+</ol>
+
+<p>To implement the language detection functionality, let’s go with a very simple implementation that relies entirely on <a href="https://pypi.org/project/pycld3/"><code class="language-plaintext highlighter-rouge">pycld3</code></a>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># language_detection.py
+</span><span class="kn">import</span> <span class="nn">cld3</span>
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">cld3</span><span class="p">.</span><span class="n">get_language</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Putting the adapter together:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">language_detection</span>
+
+<span class="k">def</span> <span class="nf">run_language_detection</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">language_detection</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">'language'</span><span class="p">:</span> <span class="n">pred</span><span class="p">.</span><span class="n">language</span><span class="p">,</span>
+        <span class="s">'probability'</span><span class="p">:</span> <span class="n">pred</span><span class="p">.</span><span class="n">probability</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>A short and sweet <code class="language-plaintext highlighter-rouge">requirements.txt</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pycld3==0.22
+</code></pre></div></div>
+
+<p>And a basic Dockerfile along the same lines as our previous runner’s:</p>
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> tensorflow/tensorflow</span>
+
+<span class="k">COPY</span><span class="s"> ./nlp/requirements.txt ./requirements.txt</span>
+<span class="k">RUN </span>pip <span class="nb">install</span> <span class="nt">--no-cache-dir</span> <span class="nt">--upgrade</span> <span class="nt">-r</span> requirements.txt
+
+<span class="k">COPY</span><span class="s"> ./runnerlib /opt/lib/runnerlib</span>
+<span class="k">WORKDIR</span><span class="s"> /opt/lib/runnerlib</span>
+<span class="k">RUN </span>pip <span class="nb">install</span> .
+
+<span class="k">WORKDIR</span><span class="s"> /opt/project</span>
+
+<span class="k">COPY</span><span class="s"> ./nlp/* ./</span>
+</code></pre></div></div>
+
+<p>The last key element to look at is the new entry in our Compose file, but no surprises there either. The setup is just like with our previous runner, but with some name updates and a different port for it to run on:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="na">nlp-runner</span><span class="pi">:</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">nlp-runner</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nlp</span>
+    <span class="na">build</span><span class="pi">:</span>
+      <span class="na">context</span><span class="pi">:</span> <span class="s">..</span>
+      <span class="na">dockerfile</span><span class="pi">:</span> <span class="s">nlp/Dockerfile</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">CONTAINER_NAME=nlp-runner</span>
+      <span class="pi">-</span> <span class="s">PORT=5001</span>
+      <span class="pi">-</span> <span class="s">RUNNER_DISCOVERY_CONTAINER_NAME=runner-discovery</span>
+      <span class="pi">-</span> <span class="s">RUNNER_DISCOVERY_PORT=5099</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">5001:5001</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">python -m runnerlib</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">runner-discovery</span>
+</code></pre></div></div>
+
+<p>Let’s look at some initialization log lines now:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nlp-runner                | INFO :: <span class="o">[</span>Discovery] :: Loading runner adapter members...
+nlp-runner                | INFO :: <span class="o">[</span>Discovery] :: Found handlers: run_language_detection
+nlp-runner                | INFO :: <span class="o">[</span>Discovery] :: Registering algorithm language_detection
+...
+controller                | INFO :: Requesting runner registry
+runner-discovery          | INFO:     172.19.0.6:59504 - <span class="s2">"GET /algorithms HTTP/1.1"</span> 200 OK
+controller                | INFO :: Obtained runner registry: <span class="o">{</span><span class="s1">'language_detection'</span>: <span class="s1">'http://nlp-runner:5001'</span>, <span class="s1">'meme_classifier'</span>: <span class="s1">'http://meme-classifier-runner:5000'</span>, <span class="s1">'ocr'</span>: <span class="s1">'http://meme-classifier-runner:5000'</span><span class="o">}</span>
+</code></pre></div></div>
+
+<p>We can see that the handler for our new algorithm was automatically found, registered and picked up by the controller. Let’s send a task for it on the queue to run on the result we got from the OCR we ran on Morpheus:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python main.py language_detection <span class="s1">'{"text": "WHAT IF 1 TOLDYOUTHAVE NO IDEA HOW MY GLASSESDONT FALL OUT"}'</span>
+</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controller                | INFO :: Received message <span class="o">{</span><span class="s1">'algorithm'</span>: <span class="s1">'language_detection'</span>, <span class="s1">'payload'</span>: <span class="o">{</span><span class="s1">'text'</span>: <span class="s1">'WHAT IF 1 TOLDYOUTHAVE NO IDEA HOW MY GLASSESDONT FALL OUT'</span><span class="o">}}</span>
+controller                | INFO :: Calling runner on http://nlp-runner:5001/run/language_detection
+nlp-runner                | INFO :: <span class="o">[</span>Server] :: Received request to run algorithm SupportedAlgorithm.language_detection on payload <span class="o">{</span><span class="s1">'text'</span>: <span class="s1">'WHAT IF 1 TOLDYOUTHAVE NO IDEA HOW MY GLASSESDONT FALL OUT'</span><span class="o">}</span>
+nlp-runner                | INFO:     172.19.0.6:49054 - <span class="s2">"POST /run/language_detection HTTP/1.1"</span> 200 OK
+controller                | INFO :: Received result from runner: <span class="o">{</span><span class="s1">'result'</span>: <span class="o">{</span><span class="s1">'language'</span>: <span class="s1">'en'</span>, <span class="s1">'probability'</span>: 0.9998741149902344<span class="o">}}</span>
+</code></pre></div></div>
+
+<h2 id="bonus-track">Bonus track</h2>
+
+<p>As we mentioned before, having dynamically generated Pydantic models for our algorithm handlers’ arguments in each of our runners, we can get automatically generated schemas for all supported algorithms. This can come in very handy when creating documentation, debugging and more. To take advantage of this, let’s simply expose a <code class="language-plaintext highlighter-rouge">/schemas</code> endpoint in <code class="language-plaintext highlighter-rouge">runnerlib</code>’s server application that invokes a new function exposed in its <code class="language-plaintext highlighter-rouge">models</code> module.</p>
+
+<p>The new function:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># models.py
+</span><span class="k">def</span> <span class="nf">get_model_schemas</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">model</span><span class="p">.</span><span class="n">schema</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">request_models_by_algorithm</span><span class="p">.</span><span class="n">items</span><span class="p">()}</span>
+</code></pre></div></div>
+
+<p>The new endpoint:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"/schemas"</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">get_schemas</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">get_model_schemas</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>If we now re-build and run our environment again, we can query this endpoint and get this useful info with a simple <code class="language-plaintext highlighter-rouge">GET</code>. However, we can take it one step further for even greater convenience. Since we’ve got our Compose YAML file at hand, if we commit to the convention of suffixing runner services (and only runner services) with <code class="language-plaintext highlighter-rouge">-runner</code>, we can cook up a straightforward script to get a summary of all supported schemas by looking for runner specs in the Compose file and querying each runner’s <code class="language-plaintext highlighter-rouge">/schemas</code> endpoint at the port it was configured to listen on. In <code class="language-plaintext highlighter-rouge">worker/get_all_schemas.sh</code>:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/usr/bin/env bash</span>
+<span class="nv">runners</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat </span>docker-compose.yml | yq <span class="s1">'.services | keys'</span> | <span class="nb">grep</span> <span class="s2">"</span><span class="se">\-</span><span class="s2">runner"</span> | <span class="nb">sed</span> <span class="s1">'s/- //g'</span><span class="si">)</span>
+<span class="k">for </span>r <span class="k">in</span> <span class="k">${</span><span class="nv">runners</span><span class="k">}</span><span class="p">;</span> <span class="k">do
+    </span><span class="nv">ports_line</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat </span>docker-compose.yml | yq <span class="s2">".services.</span><span class="k">${</span><span class="nv">r</span><span class="k">}</span><span class="s2">.ports"</span><span class="si">)</span>
+    <span class="nv">port</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nv">$ports_line</span> | <span class="nb">sed</span> <span class="nt">-E</span> <span class="s2">"s/- [0-9]+://g"</span><span class="si">)</span>
+    <span class="nb">echo</span> <span class="s2">"</span><span class="k">${</span><span class="nv">r</span><span class="k">}</span><span class="s2"> algorithm schemas:"</span>
+    curl <span class="nt">-s</span> http://localhost:<span class="k">${</span><span class="nv">port</span><span class="k">}</span>/schemas | jq <span class="nb">.</span>
+    <span class="nb">echo
+</span><span class="k">done</span>
+</code></pre></div></div>
+
+<p>The result for our current setup:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>meme-classifier-runner algorithm schemas:
+{
+  "meme_classifier": {
+    "title": "AlgorithmRequestModel_meme_classifier",
+    "type": "object",
+    "properties": {
+      "image_url": {
+        "title": "Image Url",
+        "type": "string"
+      }
+    },
+    "required": [
+      "image_url"
+    ],
+    "additionalProperties": false
+  },
+  "ocr": {
+    "title": "AlgorithmRequestModel_ocr",
+    "type": "object",
+    "properties": {
+      "image_url": {
+        "title": "Image Url",
+        "type": "string"
+      }
+    },
+    "required": [
+      "image_url"
+    ],
+    "additionalProperties": false
+  }
+}
+
+nlp-runner algorithm schemas:
+{
+  "language_detection": {
+    "title": "AlgorithmRequestModel_language_detection",
+    "type": "object",
+    "properties": {
+      "text": {
+        "title": "Text",
+        "type": "string"
+      }
+    },
+    "required": [
+      "text"
+    ],
+    "additionalProperties": false
+  }
+}
+</code></pre></div></div>
+
+<h2 id="summary">Summary</h2>
+
+<p>To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by env vars, the only addition necessary to extend an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime, are used to validate requests sent to it and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment which is useful for debugging and creating documentation.</p>
 
   </div><a class="u-url" href="/2022/03/02/plug-play-worker-pattern-3.html" hidden></a>
 </article>
