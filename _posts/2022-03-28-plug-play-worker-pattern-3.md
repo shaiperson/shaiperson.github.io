@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Plug & Play Worker Pattern - Part III"
-date: 2022-03-02 12:55:00 -0300
+date: 2022-03-28 12:55:00 -0300
 tags:
   - ml-ops
   - tech
