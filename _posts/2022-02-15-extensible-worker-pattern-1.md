@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "Plug & Play Worker Pattern - Part I"
+title: "Extensible Worker Pattern 1/3 - Theory"
+subtitle: "Motivation and theory for an extensible worker pod design pattern"
 date: 2022-02-15 12:55:00 -0300
-tags:
-  - ml-ops
-  - tech
+highlights:
+    - ML Ops
+    - Architecture
 ---
 
 ---
@@ -12,11 +13,15 @@ tags:
 
 This is **Part I** of a three-part series.
 
-- Part I - use case, pattern concepts
+- Part I - pattern motivation and theory
 - Part II - naïve implementation
 - Part III - pattern implementation
 
 ---
+
+<br/>
+* TOC
+{:toc}
 
 ## Introduction
 

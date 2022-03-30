@@ -1,24 +1,29 @@
 ---
 layout: post
 title: "ML on AWS Lambda: Two Practices"
-date: 2022-03-09 12:55:00 -0300
-tags:
-  - ml-ops
-  - tech
---- 
+date: 2022-03-28 12:55:00 -0300
+highlights:
+  - AWS Lambda
+  - AWS S3
+---
+
+* TOC
+{:toc}
+
+## Introduction
+
+I'd like to share a pattern that emerged in my work deploying machine learning (ML) inference Python code to AWS Lambda. To do this, I'll first offer three related observations. Following, we'll derive two practices from those observations that you might want to consider for your own processes.
 
 ## Observations
 
-I'd like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I'll offer three observations. Then, we'll derive two practices from those observations that you might want to consider for your own processes.
-
 ### 1. On Lambda and its filesystem feature
-AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under `/tmp` and has a hard limit of 512 MB in size (see [docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)).
+AWS Lambda can be a convenient way of deploying code to production for many use cases. Of course, it also comes with limitations. In particular, its serverless and flexible nature entails a local storage constraint: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use that is available under `/tmp` and has a hard limit of 512 MB in size (see [docs](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html)).
 
 ### 2. On using popular ML libraries  
 
-Popular ML libraries that offer pre-trained models (such as [Hugging Face](https://huggingface.co/models), [OpenAI's CLIP](https://github.com/openai/CLIP) or [JaidedAI's EasyOCR](https://github.com/JaidedAI/EasyOCR)) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they'd use as cache, but they usually expose a way to configure the paths they'll use. On the other hand, as far as I can tell at this point in time, they don't usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for one's process since it allows for a smoother iteration on code development, but it also means you're forced to rely on a filesystem, and one with sufficient available space, to be able to get your models downloaded.
+Popular ML libraries that offer pre-trained models (such as [Hugging Face](https://huggingface.co/models), [OpenAI's CLIP](https://github.com/openai/CLIP) or [JaidedAI's EasyOCR](https://github.com/JaidedAI/EasyOCR)) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they'd use as cache, but they usually expose a way to configure the paths they'll use. On the other hand, as far as I can tell at this point in time, they don't usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for development processes as it allows for a smoother iteration on code, but it also means we're forced to rely on a filesystem, and one with sufficient available space at that, to be able to get our models downloaded.
 
-Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.
+Also quite common is for single models or the conjunction of several models to exceed 512 MB.
 
 ### 3. On downloading objects from S3
 

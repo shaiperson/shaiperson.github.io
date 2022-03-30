@@ -122,11 +122,21 @@ table td { border: 1px solid #e8e8e8; }
 
 .post-list-heading { font-size: 28px; color: #343434; margin-top: 1em; }
 
-.post-list { margin-left: 0; list-style: none; }
+.post-list { margin-left: 0; list-style: none; display: flex; flex-direction: column; margin-bottom: 1em; }
 
-.post-list > li { margin-bottom: 30px; }
+.post-list > li { margin-top: 30px; margin-bottom: 30px; background: #f5f5f5; border-left: 10px #cbe2ff solid; }
 
-.post-meta { font-size: 14px; color: #828282; }
+.post-meta { margin-left: 1em; }
+
+.post-meta-section { margin: 1em; }
+
+.post-entry-inside { margin-left: 1em; }
+
+.post-subtitle { font-size: large; color: #454545; margin-bottom: 0.5em; }
+
+.post-highlight { font-size: 14px; color: #828282; border: 1px solid grey; margin-right: 0.5em; border-radius: 5px; display: inline-flex; }
+
+.post-highlight-content { margin-top: 0; font-family: monospace; margin-right: 4px; margin-left: 4px; }
 
 .post-link { display: block; font-size: 24px; }
 

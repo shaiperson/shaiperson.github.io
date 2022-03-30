@@ -2,9 +2,8 @@
 layout: post
 title: "ML Ops: A Fictional Case Study"
 date: 2021-12-04 12:14:00 -0300
-tags:
-  - ml-ops
-  - tech
+highlights:
+  - ML Ops
 ---
 
 In this article, I'd like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.

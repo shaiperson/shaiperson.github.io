@@ -3,23 +3,23 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Plug &amp; Play Worker Pattern - Part III | Blog</title>
+<title>Extensible Worker Pattern 3/3 - Complete Implementation | Blog</title>
 <meta name="generator" content="Jekyll v4.2.1" />
-<meta property="og:title" content="Plug &amp; Play Worker Pattern - Part III" />
+<meta property="og:title" content="Extensible Worker Pattern 3/3 - Complete Implementation" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
-<link rel="canonical" href="/2022/03/28/plug-play-worker-pattern-3.html" />
-<meta property="og:url" content="/2022/03/28/plug-play-worker-pattern-3.html" />
+<link rel="canonical" href="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html" />
+<meta property="og:url" content="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2022-03-28T12:55:00-03:00" />
+<meta property="article:published_time" content="2022-03-09T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part III" />
+<meta property="twitter:title" content="Extensible Worker Pattern 3/3 - Complete Implementation" />
 <script type="application/ld+json">
-{"dateModified":"2022-03-28T12:55:00-03:00","datePublished":"2022-03-28T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/28/plug-play-worker-pattern-3.html"},"url":"/2022/03/28/plug-play-worker-pattern-3.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part III","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-03-09T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html"},"url":"http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html","description":"Note","headline":"Extensible Worker Pattern 3/3 - Complete Implementation","dateModified":"2022-03-09T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
@@ -40,9 +40,9 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Plug &amp; Play Worker Pattern - Part III</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 3/3 - Complete Implementation</h1>
     <p class="post-meta">
-      <time class="dt-published" datetime="2022-03-28T12:55:00-03:00" itemprop="datePublished">Mar 28, 2022
+      <time class="dt-published" datetime="2022-03-09T12:55:00-03:00" itemprop="datePublished">Mar 9, 2022
       </time></p>
   </header>
 
@@ -53,12 +53,47 @@
 <p>This is <strong>Part III</strong> of a three-part series.</p>
 
 <ul>
-  <li>Part I - use case, pattern concepts</li>
+  <li>Part I - pattern motivation and theory</li>
   <li>Part II - naïve implementation</li>
   <li>Part III - pattern implementation</li>
 </ul>
 
 <hr />
+
+<p><br /></p>
+<ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#implementation" id="markdown-toc-implementation">Implementation</a>    <ul>
+      <li><a href="#runner-discovery" id="markdown-toc-runner-discovery">Runner Discovery</a></li>
+      <li><a href="#adapting-the-runners" id="markdown-toc-adapting-the-runners">Adapting the runners</a>        <ul>
+          <li><a href="#environment-related-code" id="markdown-toc-environment-related-code">Environment-related code</a></li>
+          <li><a href="#complying-with-the-adapter-convention" id="markdown-toc-complying-with-the-adapter-convention">Complying with the adapter convention</a></li>
+          <li><a href="#packaging-runners" id="markdown-toc-packaging-runners">Packaging runners</a></li>
+        </ul>
+      </li>
+      <li><a href="#adapting-the-controller" id="markdown-toc-adapting-the-controller">Adapting the controller</a></li>
+      <li><a href="#dockerization-compose-file" id="markdown-toc-dockerization-compose-file">Dockerization, Compose File</a></li>
+      <li><a href="#quick-test" id="markdown-toc-quick-test">Quick test</a></li>
+    </ul>
+  </li>
+  <li><a href="#adding-some-algorithms" id="markdown-toc-adding-some-algorithms">Adding some algorithms!</a>    <ul>
+      <li><a href="#in-an-existing-runner-container" id="markdown-toc-in-an-existing-runner-container">In an existing runner container</a>        <ul>
+          <li><a href="#algorithm-code" id="markdown-toc-algorithm-code">Algorithm code</a></li>
+          <li><a href="#algorithm-integration" id="markdown-toc-algorithm-integration">Algorithm integration</a></li>
+          <li><a href="#quick-test-1" id="markdown-toc-quick-test-1">Quick test</a></li>
+        </ul>
+      </li>
+      <li><a href="#in-a-new-runner-container" id="markdown-toc-in-a-new-runner-container">In a new runner container</a>        <ul>
+          <li><a href="#algorithm-code-1" id="markdown-toc-algorithm-code-1">Algorithm code</a></li>
+          <li><a href="#algorithm-integration-1" id="markdown-toc-algorithm-integration-1">Algorithm integration</a></li>
+          <li><a href="#quick-test-2" id="markdown-toc-quick-test-2">Quick test</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#bonus-free-schemas-" id="markdown-toc-bonus-free-schemas-">Bonus: free schemas ✨</a></li>
+  <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
+</ul>
 
 <h2 id="introduction">Introduction</h2>
 
@@ -85,7 +120,7 @@
 
 <p>Now, let’s go ahead and apply this pattern to our worker environment from the previous article. We’ll start with the Runner Discovery, which is both the only brand-new element in our environment and the first one to initialize. Then, we’ll look at how to adapt our runner component to the pattern. Last, we’ll extend the controller with the necessary code to have it discover the runners automatically.</p>
 
-<h4 id="general-note">General note</h4>
+<p><strong>General note on implementation</strong></p>
 
 <p>As we did in the previous article when implementing our naïve setup, we’ll Dockerize each component that goes into our worker environment and run all of them in concert using Docker Compose. To make it all work, there are a number of configuration parameters that need to be correctly set in each container of the setup, and we’ll take care to make all of these configurable by environment variables. In each Python projects that requires it, we’ll use the convention of creating a <code class="language-plaintext highlighter-rouge">settings</code> module that picks up all relevant environment variables, validates them and exposes them to other modules.</p>
 
@@ -130,7 +165,7 @@
     <span class="k">return</span> <span class="n">registry</span>
 </code></pre></div></div>
 
-<h3 id="extending-the-runners">Extending the runners</h3>
+<h3 id="adapting-the-runners">Adapting the runners</h3>
 
 <p>As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.</p>
 
@@ -307,13 +342,13 @@ for name, handler in handlers_by_algorithm.items():
     <span class="k">return</span> <span class="p">{</span><span class="s">'label'</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="s">'score'</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">score</span><span class="p">:.</span><span class="mi">5</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)}</span>
 </code></pre></div></div>
 
-<h4 id="packaging-runners-with-runnerlib">Packaging runners with <code class="language-plaintext highlighter-rouge">runnerlib</code></h4>
+<h4 id="packaging-runners">Packaging runners</h4>
 
 <p>By installing <code class="language-plaintext highlighter-rouge">runnerlib</code> in a runner’s container, it’s available to run inside it as a top-level module. The command to run the container with then simply is <code class="language-plaintext highlighter-rouge">python -m runnerlib</code>.</p>
 
 <p>To install <code class="language-plaintext highlighter-rouge">runnerlib</code>, the Dockerfile in the repo I prepared for the article simply copies the <code class="language-plaintext highlighter-rouge">runnerlib</code> code found inside the repo to the container image and runs <code class="language-plaintext highlighter-rouge">pip install</code> on it. There are many other ways to install an in-house Python package as a dependency in a container, and the best one in each case will depend on development and CI/CD processes. Whatever the case may be, note that <code class="language-plaintext highlighter-rouge">runnerlib</code> is single-sourced and can therefore be developed in one single place, versioned separately and distributed easily to any number of runner containers using a single process.</p>
 
-<h3 id="extending-the-controller">Extending the controller</h3>
+<h3 id="adapting-the-controller">Adapting the controller</h3>
 
 <p>The only bit of code missing now is to extend the Controller with some logic to get the runner registry from the Runner Discovery. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it and get a dictionary that maps algorithm names to local runner URIs.</p>
 
@@ -382,7 +417,7 @@ for name, handler in handlers_by_algorithm.items():
     <span class="c1"># ...</span>
 </code></pre></div></div>
 
-<h3 id="trying-it-out">Trying it out</h3>
+<h3 id="quick-test">Quick test</h3>
 
 <p>Let’s run the same example as in Part II, just to replicate the same usage and see that it still works.</p>
 
@@ -416,21 +451,21 @@ controller                | INFO :: Received result from runner: <span class="o"
 
 <p>The controller sends its request for a run of the meme classifier at <code class="language-plaintext highlighter-rouge">http://meme-classifier-runner:5000</code> which is the URI it received previously from the Discovery Runner when sending a <code class="language-plaintext highlighter-rouge">GET /algorithms</code> request to it.</p>
 
-<h2 id="so-is-it-really-that-extensible">So, is it really that extensible?</h2>
+<h2 id="adding-some-algorithms">Adding some algorithms!</h2>
 
 <p>We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.</p>
 
 <p>You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let’s actually add some algorithms in that same vain.</p>
 
-<h3 id="adding-a-new-algorithm-to-an-existing-runner-container">Adding a new algorithm to an existing runner container</h3>
+<h3 id="in-an-existing-runner-container">In an existing runner container</h3>
 
 <p>Our made-up company’s product team now decides that they also need the actual text content of meme images to get the insights they need into user behavior on the platform. In order to get them this information, we can incorporate OCR into our worker environment.</p>
 
-<h4 id="ocr-implementation">OCR implementation</h4>
+<h4 id="algorithm-code">Algorithm code</h4>
 
 <p>For that, we’ll use Google’s <a href="https://github.com/tesseract-ocr/tesseract">Tesseract OCR</a> through its Python wrapper <a href="https://pypi.org/project/pytesseract/"><code class="language-plaintext highlighter-rouge">pytesseract</code></a>. Tesseract works very well on images of documents but, out of the box and without any preprocessing on inputs, it behaves quite awkwardly when run on meme images. However, with some preprocessing on input images we can get some good results from it. We’ll base our implementation on this awesome <a href="https://towardsdatascience.com/extract-text-from-memes-with-python-opencv-tesseract-ocr-63c2ccd72b69">article</a> by <a href="https://medium.com/@egonferri">Egon Ferri</a> and <a href="https://medium.com/@lore.baiocco">Lorenzo Baiocco</a> that suggests some preprocessing operations and custom configuration for meme OCR with <code class="language-plaintext highlighter-rouge">pytesseract</code>.</p>
 
-<h4 id="adding-the-algorithm">Adding the algorithm</h4>
+<h4 id="algorithm-integration">Algorithm integration</h4>
 
 <p>Let’s also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).</p>
 
@@ -492,7 +527,7 @@ opencv-python-headless<span class="o">==</span>4.5.5.64
 <span class="k">RUN </span>apt-get <span class="nt">-y</span> <span class="nb">install </span>tesseract-ocr
 </code></pre></div></div>
 
-<h4 id="trying-out-the-extension">Trying out the extension</h4>
+<h4 id="quick-test-1">Quick test</h4>
 
 <p>A few log line from the environment as it initializes:</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
@@ -522,7 +557,7 @@ controller                | INFO :: Received result from runner: <span class="o"
 
 <p>The request gets sent to the correct endpoint successfully obtained from the registry.</p>
 
-<h3 id="adding-an-algorithm-in-a-new-runner-container">Adding an algorithm in a new runner container</h3>
+<h3 id="in-a-new-runner-container">In a new runner container</h3>
 
 <p>Now, after some more data gathering and analysis, our fictitious product team further realizes that they’re missing a key piece to give them insight on user behavior: they wish to know the language of the text in each meme image. To do this, we can add a language detection algorithm to our setup.</p>
 
@@ -534,6 +569,8 @@ controller                | INFO :: Received result from runner: <span class="o"
   <li>To expose a compliant <code class="language-plaintext highlighter-rouge">runner_adapter</code>.</li>
 </ol>
 
+<h4 id="algorithm-code-1">Algorithm code</h4>
+
 <p>To implement the language detection functionality, let’s go with a very simple implementation that relies entirely on <a href="https://pypi.org/project/pycld3/"><code class="language-plaintext highlighter-rouge">pycld3</code></a>:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># language_detection.py
 </span><span class="kn">import</span> <span class="nn">cld3</span>
@@ -541,6 +578,8 @@ controller                | INFO :: Received result from runner: <span class="o"
 <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">cld3</span><span class="p">.</span><span class="n">get_language</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </code></pre></div></div>
+
+<h4 id="algorithm-integration-1">Algorithm integration</h4>
 
 <p>Putting the adapter together:</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">language_detection</span>
@@ -591,6 +630,8 @@ controller                | INFO :: Received result from runner: <span class="o"
       <span class="pi">-</span> <span class="s">runner-discovery</span>
 </code></pre></div></div>
 
+<h4 id="quick-test-2">Quick test</h4>
+
 <p>Let’s look at some initialization log lines now:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nlp-runner                | INFO :: <span class="o">[</span>Discovery] :: Loading runner adapter members...
 nlp-runner                | INFO :: <span class="o">[</span>Discovery] :: Found handlers: run_language_detection
@@ -611,7 +652,7 @@ nlp-runner                | INFO:     172.19.0.6:49054 - <span class="s2">"POST 
 controller                | INFO :: Received result from runner: <span class="o">{</span><span class="s1">'result'</span>: <span class="o">{</span><span class="s1">'language'</span>: <span class="s1">'en'</span>, <span class="s1">'probability'</span>: 0.9998741149902344<span class="o">}}</span>
 </code></pre></div></div>
 
-<h2 id="bonus-track">Bonus track</h2>
+<h2 id="bonus-free-schemas-">Bonus: free schemas ✨</h2>
 
 <p>As we mentioned before, having dynamically generated Pydantic models for our algorithm handlers’ arguments in each of our runners, we can get automatically generated schemas for all supported algorithms. This can come in very handy when creating documentation, debugging and more. To take advantage of this, let’s simply expose a <code class="language-plaintext highlighter-rouge">/schemas</code> endpoint in <code class="language-plaintext highlighter-rouge">runnerlib</code>’s server application that invokes a new function exposed in its <code class="language-plaintext highlighter-rouge">models</code> module.</p>
 
@@ -695,7 +736,7 @@ nlp-runner algorithm schemas:
 
 <p>To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.</p>
 
-  </div><a class="u-url" href="/2022/03/28/plug-play-worker-pattern-3.html" hidden></a>
+  </div><a class="u-url" href="/2022/03/09/extensible-worker-pattern-3.html" hidden></a>
 </article>
 
       </div>

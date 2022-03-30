@@ -3,23 +3,23 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Plug &amp; Play Worker Pattern - Part I | Blog</title>
+<title>Extensible Worker Pattern 1/3 - Theory | Blog</title>
 <meta name="generator" content="Jekyll v4.2.1" />
-<meta property="og:title" content="Plug &amp; Play Worker Pattern - Part I" />
+<meta property="og:title" content="Extensible Worker Pattern 1/3 - Theory" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
-<link rel="canonical" href="/2022/02/15/plug-play-worker-pattern-1.html" />
-<meta property="og:url" content="/2022/02/15/plug-play-worker-pattern-1.html" />
+<link rel="canonical" href="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html" />
+<meta property="og:url" content="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-02-15T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part I" />
+<meta property="twitter:title" content="Extensible Worker Pattern 1/3 - Theory" />
 <script type="application/ld+json">
-{"dateModified":"2022-02-15T12:55:00-03:00","datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/02/15/plug-play-worker-pattern-1.html"},"url":"/2022/02/15/plug-play-worker-pattern-1.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part I","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html"},"url":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html","description":"Note","headline":"Extensible Worker Pattern 1/3 - Theory","dateModified":"2022-02-15T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
@@ -40,7 +40,7 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Plug &amp; Play Worker Pattern - Part I</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 1/3 - Theory</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2022-02-15T12:55:00-03:00" itemprop="datePublished">Feb 15, 2022
       </time></p>
@@ -53,12 +53,31 @@
 <p>This is <strong>Part I</strong> of a three-part series.</p>
 
 <ul>
-  <li>Part I - use case, pattern concepts</li>
+  <li>Part I - pattern motivation and theory</li>
   <li>Part II - naïve implementation</li>
   <li>Part III - pattern implementation</li>
 </ul>
 
 <hr />
+
+<p><br /></p>
+<ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a>    <ul>
+      <li><a href="#tldr" id="markdown-toc-tldr">tl;dr</a></li>
+      <li><a href="#a-note-on-languages" id="markdown-toc-a-note-on-languages">A note on languages</a></li>
+    </ul>
+  </li>
+  <li><a href="#the-case" id="markdown-toc-the-case">The case</a></li>
+  <li><a href="#basic-worker" id="markdown-toc-basic-worker">Basic worker</a></li>
+  <li><a href="#the-need-to-extend" id="markdown-toc-the-need-to-extend">The need to extend</a>    <ul>
+      <li><a href="#re-designing-for-extensibility" id="markdown-toc-re-designing-for-extensibility">Re-designing for extensibility</a></li>
+      <li><a href="#naïve-extension" id="markdown-toc-naïve-extension">Naïve extension</a></li>
+      <li><a href="#the-goal" id="markdown-toc-the-goal">The goal</a></li>
+      <li><a href="#the-pattern" id="markdown-toc-the-pattern">The pattern</a></li>
+    </ul>
+  </li>
+  <li><a href="#whats-next" id="markdown-toc-whats-next">What’s Next</a></li>
+</ul>
 
 <h2 id="introduction">Introduction</h2>
 
@@ -177,7 +196,7 @@ controller         | INFO :: Received result from runner: {'label': 'math_lady',
 
 <p>Click <a href="/2022/03/02/plug-play-worker-pattern-2.html">here</a> for Part II.</p>
 
-  </div><a class="u-url" href="/2022/02/15/plug-play-worker-pattern-1.html" hidden></a>
+  </div><a class="u-url" href="/2022/02/15/extensible-worker-pattern-1.html" hidden></a>
 </article>
 
       </div>

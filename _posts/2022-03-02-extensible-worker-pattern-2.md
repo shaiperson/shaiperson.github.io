@@ -1,21 +1,30 @@
 ---
 layout: post
-title: "Plug & Play Worker Pattern - Part II"
+title: "Extensible Worker Pattern 2/3 - Naïve Implementation"
+subtitle: "A meme classifier✨, Python, FastAPI and Docker"
 date: 2022-03-02 12:55:00 -0300
-tags:
-  - ml-ops
-  - tech
+highlights:
+    - Python
+    - FastAPI
+    - Docker
+    - Keras
+    - Transfer Learning
 ---
 ---
 **Note**
 
 This is **Part II** of a three-part series.
 
-- Part I - use case, pattern concepts
+- Part I - pattern motivation and theory
 - Part II - naïve implementation
 - Part III - pattern implementation
 
 ---
+
+<br/>
+* TOC
+{:toc}
+
 
 ## Introduction
 
@@ -29,7 +38,7 @@ In Part I, we:
 
 In Part II, we'll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we'll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we'll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.
 
-### A note on implementation and code structure
+**A note on implementation and code structure**
 
 As explained in Part I, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is available in branch `initial`. 
 

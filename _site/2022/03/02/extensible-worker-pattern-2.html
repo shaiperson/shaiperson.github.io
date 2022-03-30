@@ -3,23 +3,23 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Plug &amp; Play Worker Pattern - Part II | Blog</title>
+<title>Extensible Worker Pattern 2/3 - Naïve Implementation | Blog</title>
 <meta name="generator" content="Jekyll v4.2.1" />
-<meta property="og:title" content="Plug &amp; Play Worker Pattern - Part II" />
+<meta property="og:title" content="Extensible Worker Pattern 2/3 - Naïve Implementation" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
-<link rel="canonical" href="/2022/03/02/plug-play-worker-pattern-2.html" />
-<meta property="og:url" content="/2022/03/02/plug-play-worker-pattern-2.html" />
+<link rel="canonical" href="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html" />
+<meta property="og:url" content="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-03-02T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Plug &amp; Play Worker Pattern - Part II" />
+<meta property="twitter:title" content="Extensible Worker Pattern 2/3 - Naïve Implementation" />
 <script type="application/ld+json">
-{"dateModified":"2022-03-02T12:55:00-03:00","datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/02/plug-play-worker-pattern-2.html"},"url":"/2022/03/02/plug-play-worker-pattern-2.html","description":"Note","headline":"Plug &amp; Play Worker Pattern - Part II","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html"},"url":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html","description":"Note","headline":"Extensible Worker Pattern 2/3 - Naïve Implementation","dateModified":"2022-03-02T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
@@ -40,7 +40,7 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Plug &amp; Play Worker Pattern - Part II</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 2/3 - Naïve Implementation</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2022-03-02T12:55:00-03:00" itemprop="datePublished">Mar 2, 2022
       </time></p>
@@ -53,12 +53,31 @@
 <p>This is <strong>Part II</strong> of a three-part series.</p>
 
 <ul>
-  <li>Part I - use case, pattern concepts</li>
+  <li>Part I - pattern motivation and theory</li>
   <li>Part II - naïve implementation</li>
   <li>Part III - pattern implementation</li>
 </ul>
 
 <hr />
+
+<p><br /></p>
+<ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#implementation" id="markdown-toc-implementation">Implementation</a>    <ul>
+      <li><a href="#controller" id="markdown-toc-controller">Controller</a></li>
+      <li><a href="#classifier" id="markdown-toc-classifier">Classifier</a></li>
+      <li><a href="#dockerization-compose-file" id="markdown-toc-dockerization-compose-file">Dockerization, Compose File</a>        <ul>
+          <li><a href="#controller-dockerfile" id="markdown-toc-controller-dockerfile">Controller Dockerfile</a></li>
+          <li><a href="#classifier-dockerfile" id="markdown-toc-classifier-dockerfile">Classifier Dockerfile</a></li>
+          <li><a href="#compose-file" id="markdown-toc-compose-file">Compose file</a></li>
+          <li><a href="#producer" id="markdown-toc-producer">Producer</a></li>
+        </ul>
+      </li>
+      <li><a href="#testing-it-out" id="markdown-toc-testing-it-out">Testing it out</a></li>
+    </ul>
+  </li>
+  <li><a href="#whats-next" id="markdown-toc-whats-next">What’s Next</a></li>
+</ul>
 
 <h2 id="introduction">Introduction</h2>
 
@@ -74,7 +93,7 @@
 
 <p>In Part II, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.</p>
 
-<h3 id="a-note-on-implementation-and-code-structure">A note on implementation and code structure</h3>
+<p><strong>A note on implementation and code structure</strong></p>
 
 <p>As explained in Part I, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example <a href="https://github.com/shaiperson/worker-pattern-article">this GitHub repo</a>. Code for the initial design presented here is available in branch <code class="language-plaintext highlighter-rouge">initial</code>.</p>
 
@@ -295,7 +314,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 <p>In Part III of the series, we’ll implement the final pattern presented in Part I and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.</p>
 
-  </div><a class="u-url" href="/2022/03/02/plug-play-worker-pattern-2.html" hidden></a>
+  </div><a class="u-url" href="/2022/03/02/extensible-worker-pattern-2.html" hidden></a>
 </article>
 
       </div>

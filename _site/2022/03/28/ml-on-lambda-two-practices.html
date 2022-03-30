@@ -7,19 +7,19 @@
 <meta name="generator" content="Jekyll v4.2.1" />
 <meta property="og:title" content="ML on AWS Lambda: Two Practices" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Observations" />
-<meta property="og:description" content="Observations" />
-<link rel="canonical" href="/2022/03/09/ml-on-lambda-two-practices.html" />
-<meta property="og:url" content="/2022/03/09/ml-on-lambda-two-practices.html" />
+<meta name="description" content="MS in Computer Science, freelance engineer and entrepreneur" />
+<meta property="og:description" content="MS in Computer Science, freelance engineer and entrepreneur" />
+<link rel="canonical" href="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html" />
+<meta property="og:url" content="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2022-03-09T12:55:00-03:00" />
+<meta property="article:published_time" content="2022-03-28T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="ML on AWS Lambda: Two Practices" />
 <script type="application/ld+json">
-{"dateModified":"2022-03-09T12:55:00-03:00","datePublished":"2022-03-09T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/09/ml-on-lambda-two-practices.html"},"url":"/2022/03/09/ml-on-lambda-two-practices.html","description":"Observations","headline":"ML on AWS Lambda: Two Practices","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-03-28T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html"},"url":"http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html","description":"MS in Computer Science, freelance engineer and entrepreneur","headline":"ML on AWS Lambda: Two Practices","dateModified":"2022-03-28T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
@@ -42,23 +42,41 @@
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">ML on AWS Lambda: Two Practices</h1>
     <p class="post-meta">
-      <time class="dt-published" datetime="2022-03-09T12:55:00-03:00" itemprop="datePublished">Mar 9, 2022
+      <time class="dt-published" datetime="2022-03-28T12:55:00-03:00" itemprop="datePublished">Mar 28, 2022
       </time></p>
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <h2 id="observations">Observations</h2>
+    <ul id="markdown-toc">
+  <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
+  <li><a href="#observations" id="markdown-toc-observations">Observations</a>    <ul>
+      <li><a href="#1-on-lambda-and-its-filesystem-feature" id="markdown-toc-1-on-lambda-and-its-filesystem-feature">1. On Lambda and its filesystem feature</a></li>
+      <li><a href="#2-on-using-popular-ml-libraries" id="markdown-toc-2-on-using-popular-ml-libraries">2. On using popular ML libraries</a></li>
+      <li><a href="#3-on-downloading-objects-from-s3" id="markdown-toc-3-on-downloading-objects-from-s3">3. On downloading objects from S3</a></li>
+    </ul>
+  </li>
+  <li><a href="#deriving-practices" id="markdown-toc-deriving-practices">Deriving practices</a>    <ul>
+      <li><a href="#1-make-libraries-on-disk-cache-path-configurable-by-environment" id="markdown-toc-1-make-libraries-on-disk-cache-path-configurable-by-environment">1. Make libraries’ on-disk cache path configurable by environment</a></li>
+      <li><a href="#use-s3-to-store-models-and-stream-them-into-ram" id="markdown-toc-use-s3-to-store-models-and-stream-them-into-ram">Use S3 to store models and stream them into RAM</a></li>
+      <li><a href="#a-final-note" id="markdown-toc-a-final-note">A final note</a></li>
+    </ul>
+  </li>
+</ul>
 
-<p>I’d like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I’ll offer three observations. Then, we’ll derive two practices from those observations that you might want to consider for your own processes.</p>
+<h2 id="introduction">Introduction</h2>
+
+<p>I’d like to share a pattern that emerged in my work deploying machine learning (ML) inference Python code to AWS Lambda. To do this, I’ll first offer three related observations. Following, we’ll derive two practices from those observations that you might want to consider for your own processes.</p>
+
+<h2 id="observations">Observations</h2>
 
 <h3 id="1-on-lambda-and-its-filesystem-feature">1. On Lambda and its filesystem feature</h3>
-<p>AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under <code class="language-plaintext highlighter-rouge">/tmp</code> and has a hard limit of 512 MB in size (see <a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">docs</a>).</p>
+<p>AWS Lambda can be a convenient way of deploying code to production for many use cases. Of course, it also comes with limitations. In particular, its serverless and flexible nature entails a local storage constraint: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use that is available under <code class="language-plaintext highlighter-rouge">/tmp</code> and has a hard limit of 512 MB in size (see <a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html">docs</a>).</p>
 
 <h3 id="2-on-using-popular-ml-libraries">2. On using popular ML libraries</h3>
 
-<p>Popular ML libraries that offer pre-trained models (such as <a href="https://huggingface.co/models">Hugging Face</a>, <a href="https://github.com/openai/CLIP">OpenAI’s CLIP</a> or <a href="https://github.com/JaidedAI/EasyOCR">JaidedAI’s EasyOCR</a>) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they’d use as cache, but they usually expose a way to configure the paths they’ll use. On the other hand, as far as I can tell at this point in time, they don’t usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for one’s process since it allows for a smoother iteration on code development, but it also means you’re forced to rely on a filesystem, and one with sufficient available space, to be able to get your models downloaded.</p>
+<p>Popular ML libraries that offer pre-trained models (such as <a href="https://huggingface.co/models">Hugging Face</a>, <a href="https://github.com/openai/CLIP">OpenAI’s CLIP</a> or <a href="https://github.com/JaidedAI/EasyOCR">JaidedAI’s EasyOCR</a>) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they’d use as cache, but they usually expose a way to configure the paths they’ll use. On the other hand, as far as I can tell at this point in time, they don’t usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for development processes as it allows for a smoother iteration on code, but it also means we’re forced to rely on a filesystem, and one with sufficient available space at that, to be able to get our models downloaded.</p>
 
-<p>Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.</p>
+<p>Also quite common is for single models or the conjunction of several models to exceed 512 MB.</p>
 
 <h3 id="3-on-downloading-objects-from-s3">3. On downloading objects from S3</h3>
 
@@ -139,7 +157,7 @@
 <p>Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.</p>
 
 
-  </div><a class="u-url" href="/2022/03/09/ml-on-lambda-two-practices.html" hidden></a>
+  </div><a class="u-url" href="/2022/03/28/ml-on-lambda-two-practices.html" hidden></a>
 </article>
 
       </div>

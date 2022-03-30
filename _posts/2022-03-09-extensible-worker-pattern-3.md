@@ -1,21 +1,28 @@
 ---
 layout: post
-title: "Plug & Play Worker Pattern - Part III"
-date: 2022-03-28 12:55:00 -0300
-tags:
-  - ml-ops
-  - tech
+title: "Extensible Worker Pattern 3/3 - Complete Implementation"
+subtitle: "Python, FastAPI and dynamic model generation using Pydantic"
+date: 2022-03-09 12:55:00 -0300
+highlights:
+    - Python
+    - FastAPI
+    - Docker
+    - Pydantic
 ---
 ---
 **Note**
 
 This is **Part III** of a three-part series.
 
-- Part I - use case, pattern concepts
+- Part I - pattern motivation and theory
 - Part II - naïve implementation
 - Part III - pattern implementation
 
 ---
+
+<br/>
+* TOC
+{:toc}
 
 ## Introduction
 
@@ -40,7 +47,7 @@ We have a Runner Discovery component responsible for holding a registry of suppo
 
 Now, let's go ahead and apply this pattern to our worker environment from the previous article. We'll start with the Runner Discovery, which is both the only brand-new element in our environment and the first one to initialize. Then, we'll look at how to adapt our runner component to the pattern. Last, we'll extend the controller with the necessary code to have it discover the runners automatically.
 
-#### General note
+**General note on implementation**
 
 As we did in the previous article when implementing our naïve setup, we'll Dockerize each component that goes into our worker environment and run all of them in concert using Docker Compose. To make it all work, there are a number of configuration parameters that need to be correctly set in each container of the setup, and we'll take care to make all of these configurable by environment variables. In each Python projects that requires it, we'll use the convention of creating a `settings` module that picks up all relevant environment variables, validates them and exposes them to other modules.
 
@@ -85,7 +92,7 @@ async def get_registry():
     return registry
 ```
  
-### Extending the runners
+### Adapting the runners
  
 As we've seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they're reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.
  
@@ -269,13 +276,13 @@ def run_meme_classifier(image_url: str):
     return {'label': label, 'score': float(f'{score:.5f}')}
 ```
 
-#### Packaging runners with `runnerlib`
+#### Packaging runners
 
 By installing `runnerlib` in a runner's container, it's available to run inside it as a top-level module. The command to run the container with then simply is `python -m runnerlib`.
 
 To install `runnerlib`, the Dockerfile in the repo I prepared for the article simply copies the `runnerlib` code found inside the repo to the container image and runs `pip install` on it. There are many other ways to install an in-house Python package as a dependency in a container, and the best one in each case will depend on development and CI/CD processes. Whatever the case may be, note that `runnerlib` is single-sourced and can therefore be developed in one single place, versioned separately and distributed easily to any number of runner containers using a single process.
 
-### Extending the controller
+### Adapting the controller
 
 The only bit of code missing now is to extend the Controller with some logic to get the runner registry from the Runner Discovery. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a `GET /algorithms` request to it and get a dictionary that maps algorithm names to local runner URIs.
 
@@ -349,7 +356,7 @@ controller:
     # ...
 ```
 
-### Trying it out
+### Quick test
 
 Let's run the same example as in Part II, just to replicate the same usage and see that it still works.
 
@@ -386,21 +393,21 @@ controller                | INFO :: Received result from runner: {'result': {'la
 
 The controller sends its request for a run of the meme classifier at `http://meme-classifier-runner:5000` which is the URI it received previously from the Discovery Runner when sending a `GET /algorithms` request to it.
 
-## So, is it really that extensible?
+## Adding some algorithms!
 
 We couldn't end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.
 
 You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let's actually add some algorithms in that same vain. 
 
-### Adding a new algorithm to an existing runner container
+### In an existing runner container
 
 Our made-up company's product team now decides that they also need the actual text content of meme images to get the insights they need into user behavior on the platform. In order to get them this information, we can incorporate OCR into our worker environment.
 
-#### OCR implementation
+#### Algorithm code
 
 For that, we'll use Google's [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) through its Python wrapper [`pytesseract`](https://pypi.org/project/pytesseract/). Tesseract works very well on images of documents but, out of the box and without any preprocessing on inputs, it behaves quite awkwardly when run on meme images. However, with some preprocessing on input images we can get some good results from it. We'll base our implementation on this awesome [article](https://towardsdatascience.com/extract-text-from-memes-with-python-opencv-tesseract-ocr-63c2ccd72b69) by [Egon Ferri](https://medium.com/@egonferri) and [Lorenzo Baiocco](https://medium.com/@lore.baiocco) that suggests some preprocessing operations and custom configuration for meme OCR with `pytesseract`.
 
-#### Adding the algorithm
+#### Algorithm integration
 
 Let's also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).
 
@@ -468,7 +475,7 @@ RUN apt-get update
 RUN apt-get -y install tesseract-ocr
 ```
 
-#### Trying out the extension
+#### Quick test
 
 A few log line from the environment as it initializes:
 ```
@@ -501,7 +508,7 @@ controller                | INFO :: Received result from runner: {'result': 'WHA
 
 The request gets sent to the correct endpoint successfully obtained from the registry. 
 
-### Adding an algorithm in a new runner container
+### In a new runner container
 
 Now, after some more data gathering and analysis, our fictitious product team further realizes that they're missing a key piece to give them insight on user behavior: they wish to know the language of the text in each meme image. To do this, we can add a language detection algorithm to our setup.
 
@@ -511,6 +518,8 @@ To integrate this new runner, the only requirements it needs to satisfy are:
 1. To be packaged in a Docker image with `runnerlib`
 2. To expose a compliant `runner_adapter`.
 
+#### Algorithm code
+
 To implement the language detection functionality, let's go with a very simple implementation that relies entirely on [`pycld3`](https://pypi.org/project/pycld3/):
 ```python
 # language_detection.py
@@ -519,6 +528,8 @@ import cld3
 def run(text):
     return cld3.get_language(text)
 ```
+
+#### Algorithm integration
 
 Putting the adapter together:
 ```python
@@ -573,6 +584,8 @@ The last key element to look at is the new entry in our Compose file, but no sur
       - runner-discovery
 ```
 
+#### Quick test
+
 Let's look at some initialization log lines now:
 ```bash
 nlp-runner                | INFO :: [Discovery] :: Loading runner adapter members...
@@ -596,7 +609,7 @@ nlp-runner                | INFO:     172.19.0.6:49054 - "POST /run/language_det
 controller                | INFO :: Received result from runner: {'result': {'language': 'en', 'probability': 0.9998741149902344}}
 ```
 
-## Bonus track
+## Bonus: free schemas ✨
 
 As we mentioned before, having dynamically generated Pydantic models for our algorithm handlers' arguments in each of our runners, we can get automatically generated schemas for all supported algorithms. This can come in very handy when creating documentation, debugging and more. To take advantage of this, let's simply expose a `/schemas` endpoint in `runnerlib`'s server application that invokes a new function exposed in its `models` module.
 

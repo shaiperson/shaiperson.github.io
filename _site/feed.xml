@@ -1,15 +1,157 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-29T10:26:29-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part III</title><link href="/2022/03/28/plug-play-worker-pattern-3.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part III" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>/2022/03/28/plug-play-worker-pattern-3</id><content type="html" xml:base="/2022/03/28/plug-play-worker-pattern-3.html">&lt;hr /&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-29T21:48:14-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/28/ml-on-lambda-two-practices</id><content type="html" xml:base="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html">&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#observations&quot; id=&quot;markdown-toc-observations&quot;&gt;Observations&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#1-on-lambda-and-its-filesystem-feature&quot; id=&quot;markdown-toc-1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#2-on-using-popular-ml-libraries&quot; id=&quot;markdown-toc-2-on-using-popular-ml-libraries&quot;&gt;2. On using popular ML libraries&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#3-on-downloading-objects-from-s3&quot; id=&quot;markdown-toc-3-on-downloading-objects-from-s3&quot;&gt;3. On downloading objects from S3&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#deriving-practices&quot; id=&quot;markdown-toc-deriving-practices&quot;&gt;Deriving practices&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#1-make-libraries-on-disk-cache-path-configurable-by-environment&quot; id=&quot;markdown-toc-1-make-libraries-on-disk-cache-path-configurable-by-environment&quot;&gt;1. Make libraries’ on-disk cache path configurable by environment&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#use-s3-to-store-models-and-stream-them-into-ram&quot; id=&quot;markdown-toc-use-s3-to-store-models-and-stream-them-into-ram&quot;&gt;Use S3 to store models and stream them into RAM&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#a-final-note&quot; id=&quot;markdown-toc-a-final-note&quot;&gt;A final note&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;I’d like to share a pattern that emerged in my work deploying machine learning (ML) inference Python code to AWS Lambda. To do this, I’ll first offer three related observations. Following, we’ll derive two practices from those observations that you might want to consider for your own processes.&lt;/p&gt;
+
+&lt;h2 id=&quot;observations&quot;&gt;Observations&lt;/h2&gt;
+
+&lt;h3 id=&quot;1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/h3&gt;
+&lt;p&gt;AWS Lambda can be a convenient way of deploying code to production for many use cases. Of course, it also comes with limitations. In particular, its serverless and flexible nature entails a local storage constraint: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use that is available under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and has a hard limit of 512 MB in size (see &lt;a href=&quot;https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html&quot;&gt;docs&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h3 id=&quot;2-on-using-popular-ml-libraries&quot;&gt;2. On using popular ML libraries&lt;/h3&gt;
+
+&lt;p&gt;Popular ML libraries that offer pre-trained models (such as &lt;a href=&quot;https://huggingface.co/models&quot;&gt;Hugging Face&lt;/a&gt;, &lt;a href=&quot;https://github.com/openai/CLIP&quot;&gt;OpenAI’s CLIP&lt;/a&gt; or &lt;a href=&quot;https://github.com/JaidedAI/EasyOCR&quot;&gt;JaidedAI’s EasyOCR&lt;/a&gt;) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they’d use as cache, but they usually expose a way to configure the paths they’ll use. On the other hand, as far as I can tell at this point in time, they don’t usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for development processes as it allows for a smoother iteration on code, but it also means we’re forced to rely on a filesystem, and one with sufficient available space at that, to be able to get our models downloaded.&lt;/p&gt;
+
+&lt;p&gt;Also quite common is for single models or the conjunction of several models to exceed 512 MB.&lt;/p&gt;
+
+&lt;h3 id=&quot;3-on-downloading-objects-from-s3&quot;&gt;3. On downloading objects from S3&lt;/h3&gt;
+
+&lt;p&gt;When you need to get an object from S3, you often just need to download it to disk. This seems intuitive and easy, and is a common practice. You may even do this when you only need the object in RAM, by downloading it first to your filesystem and then loading it into your program from there:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'my-bucket'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'my_file.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'temp_my_file.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'w'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download_fileobj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# do something with temp_my_file.txt, remember to delete it if appropriate.
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;However, if you’re going to download the S3 object to disk only to then load and use it in RAM, then you’d probably prefer a way to get the object into RAM directly.&lt;/p&gt;
+
+&lt;h2 id=&quot;deriving-practices&quot;&gt;Deriving practices&lt;/h2&gt;
+
+&lt;p&gt;Deploying ML inference code is a worthy use case for Lambda. But, in light of popular libraries relying on disk space for getting you pre-trained models, if you use enough of these then your lambdas are liable to eventually run into the 512 MB limit. This would be the case even if you don’t download pre-trained models but you do rely on getting models (either pre-downloaded, trained by you or whatever the case may be) from a remote storage service with which you’re interacting in a similar way to what I showed before with S3.&lt;/p&gt;
+
+&lt;p&gt;So, to solve this potential and likely issue, two good practices you may want to adopt follow.&lt;/p&gt;
+
+&lt;h3 id=&quot;1-make-libraries-on-disk-cache-path-configurable-by-environment&quot;&gt;1. Make libraries’ on-disk cache path configurable by environment&lt;/h3&gt;
+
+&lt;p&gt;Either on a model-by-model basis or for all of your library-downloaded models, leverage these libraries’ options to configure cache paths and use environment variables to set them. If you work with a separate ML team that writes your Lambda-bound code, encourage them to adopt this practice on your behalf. That way, when you deploy your code to Lambda, you’ll be able to easily have those paths stem from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and to avoid “read-only filesystem” errors coming from your libraries attempting to write to off-limits paths. This won’t save you from running into the storage space limit, but it will make deployment easier while your space usage is within bounds.&lt;/p&gt;
+
+&lt;p&gt;To view this in an example, let’s assume our code uses CLIP’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ViT-B/32&lt;/code&gt; and Hugging Face’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bert-base-cased&lt;/code&gt;. This means our code at a certain point might include some lines like:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;clip&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;transformers&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;preprocess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ViT-B/32'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bert&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_pretrained&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'bert-base-cased'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The default cache dirs used by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;clip&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;transformers&lt;/code&gt; in these function calls are (at this point in time) under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache&lt;/code&gt;, namely &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache/torch/transformers&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache/clip&lt;/code&gt; respectively. To adopt this practice, you’d set something like a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MODEL_CACHE_FS_PATH&lt;/code&gt; environment variable to a path starting with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and use those libraries’ cache path configuration options:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;clip&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;transformers&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;environ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'MODEL_CACHE_FS_PATH'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'./cache'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;preprocess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ViT-B/32'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;download_root&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;bert&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_pretrained&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'bert-base-cased'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;use-s3-to-store-models-and-stream-them-into-ram&quot;&gt;Use S3 to store models and stream them into RAM&lt;/h3&gt;
+
+&lt;p&gt;Once your library-downloaded models (or other large files you may need) conspire to exceed the 512 MB to your lambdas, you’ll need a way to download them that does not require a filesystem. S3 is indeed a good option, since it does offer an easy way to stream objects directly to RAM. If you’re deploying Python code to Lambda, this is very easy to do using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;boto3&lt;/code&gt;. The way you might take advantage of this option is to pre-download the models you’ve been getting through your libraries’ API, serialize them (e.g by using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pickle&lt;/code&gt; or library-specific serialization APIs), upload the serialized files to S3 and then fetch those objects in your Lambda-bound code in a way that gets them into RAM directly. Note, of course, that this is useful for models you get from other sources as well, such as the ones you train yourself.&lt;/p&gt;
+
+&lt;p&gt;To quickly look at an example for this, let’s assume we’re using PyTorch and you’ve pickled and uploaded the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;state_dict&lt;/code&gt; of an instance of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Model&lt;/code&gt; to S3 at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;models-bucket/model_state_dict.pkl&lt;/code&gt;. This is what your code might look like.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;io&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pickle&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Stream pickled `state_dict` into variable rather than save to disk
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BytesIO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'models-bucket'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'model_state_dict.pkl'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download_fileobj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pickled_state_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getvalue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Load model
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pickle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pickled_state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Have fun with model
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;a-final-note&quot;&gt;A final note&lt;/h3&gt;
+
+&lt;p&gt;Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.&lt;/p&gt;</content><author><name></name></author></entry><entry><title type="html">Extensible Worker Pattern 3/3 - Complete Implementation</title><link href="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 3/3 - Complete Implementation" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/09/extensible-worker-pattern-3</id><content type="html" xml:base="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part III&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - use case, pattern concepts&lt;/li&gt;
+  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
   &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
   &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#implementation&quot; id=&quot;markdown-toc-implementation&quot;&gt;Implementation&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#runner-discovery&quot; id=&quot;markdown-toc-runner-discovery&quot;&gt;Runner Discovery&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#adapting-the-runners&quot; id=&quot;markdown-toc-adapting-the-runners&quot;&gt;Adapting the runners&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#environment-related-code&quot; id=&quot;markdown-toc-environment-related-code&quot;&gt;Environment-related code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#complying-with-the-adapter-convention&quot; id=&quot;markdown-toc-complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#packaging-runners&quot; id=&quot;markdown-toc-packaging-runners&quot;&gt;Packaging runners&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#adapting-the-controller&quot; id=&quot;markdown-toc-adapting-the-controller&quot;&gt;Adapting the controller&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#dockerization-compose-file&quot; id=&quot;markdown-toc-dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#quick-test&quot; id=&quot;markdown-toc-quick-test&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#adding-some-algorithms&quot; id=&quot;markdown-toc-adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#in-an-existing-runner-container&quot; id=&quot;markdown-toc-in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-code&quot; id=&quot;markdown-toc-algorithm-code&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-integration&quot; id=&quot;markdown-toc-algorithm-integration&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#quick-test-1&quot; id=&quot;markdown-toc-quick-test-1&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#in-a-new-runner-container&quot; id=&quot;markdown-toc-in-a-new-runner-container&quot;&gt;In a new runner container&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-code-1&quot; id=&quot;markdown-toc-algorithm-code-1&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-integration-1&quot; id=&quot;markdown-toc-algorithm-integration-1&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#quick-test-2&quot; id=&quot;markdown-toc-quick-test-2&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bonus-free-schemas-&quot; id=&quot;markdown-toc-bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
@@ -36,7 +178,7 @@
 
 &lt;p&gt;Now, let’s go ahead and apply this pattern to our worker environment from the previous article. We’ll start with the Runner Discovery, which is both the only brand-new element in our environment and the first one to initialize. Then, we’ll look at how to adapt our runner component to the pattern. Last, we’ll extend the controller with the necessary code to have it discover the runners automatically.&lt;/p&gt;
 
-&lt;h4 id=&quot;general-note&quot;&gt;General note&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;General note on implementation&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;As we did in the previous article when implementing our naïve setup, we’ll Dockerize each component that goes into our worker environment and run all of them in concert using Docker Compose. To make it all work, there are a number of configuration parameters that need to be correctly set in each container of the setup, and we’ll take care to make all of these configurable by environment variables. In each Python projects that requires it, we’ll use the convention of creating a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;settings&lt;/code&gt; module that picks up all relevant environment variables, validates them and exposes them to other modules.&lt;/p&gt;
 
@@ -81,7 +223,7 @@
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;extending-the-runners&quot;&gt;Extending the runners&lt;/h3&gt;
+&lt;h3 id=&quot;adapting-the-runners&quot;&gt;Adapting the runners&lt;/h3&gt;
 
 &lt;p&gt;As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.&lt;/p&gt;
 
@@ -258,13 +400,13 @@ for name, handler in handlers_by_algorithm.items():
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'label'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;label&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'score'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h4 id=&quot;packaging-runners-with-runnerlib&quot;&gt;Packaging runners with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;&lt;/h4&gt;
+&lt;h4 id=&quot;packaging-runners&quot;&gt;Packaging runners&lt;/h4&gt;
 
 &lt;p&gt;By installing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt; in a runner’s container, it’s available to run inside it as a top-level module. The command to run the container with then simply is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;python -m runnerlib&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;To install &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;, the Dockerfile in the repo I prepared for the article simply copies the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt; code found inside the repo to the container image and runs &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip install&lt;/code&gt; on it. There are many other ways to install an in-house Python package as a dependency in a container, and the best one in each case will depend on development and CI/CD processes. Whatever the case may be, note that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt; is single-sourced and can therefore be developed in one single place, versioned separately and distributed easily to any number of runner containers using a single process.&lt;/p&gt;
 
-&lt;h3 id=&quot;extending-the-controller&quot;&gt;Extending the controller&lt;/h3&gt;
+&lt;h3 id=&quot;adapting-the-controller&quot;&gt;Adapting the controller&lt;/h3&gt;
 
 &lt;p&gt;The only bit of code missing now is to extend the Controller with some logic to get the runner registry from the Runner Discovery. This is a very simple addition to make: by using the API we defined for Discovery Runner, just send a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GET /algorithms&lt;/code&gt; request to it and get a dictionary that maps algorithm names to local runner URIs.&lt;/p&gt;
 
@@ -333,7 +475,7 @@ for name, handler in handlers_by_algorithm.items():
     &lt;span class=&quot;c1&quot;&gt;# ...&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;trying-it-out&quot;&gt;Trying it out&lt;/h3&gt;
+&lt;h3 id=&quot;quick-test&quot;&gt;Quick test&lt;/h3&gt;
 
 &lt;p&gt;Let’s run the same example as in Part II, just to replicate the same usage and see that it still works.&lt;/p&gt;
 
@@ -367,21 +509,21 @@ controller                | INFO :: Received result from runner: &lt;span class=
 
 &lt;p&gt;The controller sends its request for a run of the meme classifier at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://meme-classifier-runner:5000&lt;/code&gt; which is the URI it received previously from the Discovery Runner when sending a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GET /algorithms&lt;/code&gt; request to it.&lt;/p&gt;
 
-&lt;h2 id=&quot;so-is-it-really-that-extensible&quot;&gt;So, is it really that extensible?&lt;/h2&gt;
+&lt;h2 id=&quot;adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/h2&gt;
 
 &lt;p&gt;We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.&lt;/p&gt;
 
 &lt;p&gt;You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let’s actually add some algorithms in that same vain.&lt;/p&gt;
 
-&lt;h3 id=&quot;adding-a-new-algorithm-to-an-existing-runner-container&quot;&gt;Adding a new algorithm to an existing runner container&lt;/h3&gt;
+&lt;h3 id=&quot;in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/h3&gt;
 
 &lt;p&gt;Our made-up company’s product team now decides that they also need the actual text content of meme images to get the insights they need into user behavior on the platform. In order to get them this information, we can incorporate OCR into our worker environment.&lt;/p&gt;
 
-&lt;h4 id=&quot;ocr-implementation&quot;&gt;OCR implementation&lt;/h4&gt;
+&lt;h4 id=&quot;algorithm-code&quot;&gt;Algorithm code&lt;/h4&gt;
 
 &lt;p&gt;For that, we’ll use Google’s &lt;a href=&quot;https://github.com/tesseract-ocr/tesseract&quot;&gt;Tesseract OCR&lt;/a&gt; through its Python wrapper &lt;a href=&quot;https://pypi.org/project/pytesseract/&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pytesseract&lt;/code&gt;&lt;/a&gt;. Tesseract works very well on images of documents but, out of the box and without any preprocessing on inputs, it behaves quite awkwardly when run on meme images. However, with some preprocessing on input images we can get some good results from it. We’ll base our implementation on this awesome &lt;a href=&quot;https://towardsdatascience.com/extract-text-from-memes-with-python-opencv-tesseract-ocr-63c2ccd72b69&quot;&gt;article&lt;/a&gt; by &lt;a href=&quot;https://medium.com/@egonferri&quot;&gt;Egon Ferri&lt;/a&gt; and &lt;a href=&quot;https://medium.com/@lore.baiocco&quot;&gt;Lorenzo Baiocco&lt;/a&gt; that suggests some preprocessing operations and custom configuration for meme OCR with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pytesseract&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h4 id=&quot;adding-the-algorithm&quot;&gt;Adding the algorithm&lt;/h4&gt;
+&lt;h4 id=&quot;algorithm-integration&quot;&gt;Algorithm integration&lt;/h4&gt;
 
 &lt;p&gt;Let’s also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).&lt;/p&gt;
 
@@ -443,7 +585,7 @@ opencv-python-headless&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;4.5.5.64
 &lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;apt-get &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;tesseract-ocr
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h4 id=&quot;trying-out-the-extension&quot;&gt;Trying out the extension&lt;/h4&gt;
+&lt;h4 id=&quot;quick-test-1&quot;&gt;Quick test&lt;/h4&gt;
 
 &lt;p&gt;A few log line from the environment as it initializes:&lt;/p&gt;
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;meme-classifier-runner    | INFO :: [Discovery] :: Loading runner adapter members...
@@ -473,7 +615,7 @@ controller                | INFO :: Received result from runner: &lt;span class=
 
 &lt;p&gt;The request gets sent to the correct endpoint successfully obtained from the registry.&lt;/p&gt;
 
-&lt;h3 id=&quot;adding-an-algorithm-in-a-new-runner-container&quot;&gt;Adding an algorithm in a new runner container&lt;/h3&gt;
+&lt;h3 id=&quot;in-a-new-runner-container&quot;&gt;In a new runner container&lt;/h3&gt;
 
 &lt;p&gt;Now, after some more data gathering and analysis, our fictitious product team further realizes that they’re missing a key piece to give them insight on user behavior: they wish to know the language of the text in each meme image. To do this, we can add a language detection algorithm to our setup.&lt;/p&gt;
 
@@ -485,6 +627,8 @@ controller                | INFO :: Received result from runner: &lt;span class=
   &lt;li&gt;To expose a compliant &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt;.&lt;/li&gt;
 &lt;/ol&gt;
 
+&lt;h4 id=&quot;algorithm-code-1&quot;&gt;Algorithm code&lt;/h4&gt;
+
 &lt;p&gt;To implement the language detection functionality, let’s go with a very simple implementation that relies entirely on &lt;a href=&quot;https://pypi.org/project/pycld3/&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pycld3&lt;/code&gt;&lt;/a&gt;:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# language_detection.py
 &lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;cld3&lt;/span&gt;
@@ -492,6 +636,8 @@ controller                | INFO :: Received result from runner: &lt;span class=
 &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cld3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_language&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;algorithm-integration-1&quot;&gt;Algorithm integration&lt;/h4&gt;
 
 &lt;p&gt;Putting the adapter together:&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;language_detection&lt;/span&gt;
@@ -542,6 +688,8 @@ controller                | INFO :: Received result from runner: &lt;span class=
       &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;runner-discovery&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
+&lt;h4 id=&quot;quick-test-2&quot;&gt;Quick test&lt;/h4&gt;
+
 &lt;p&gt;Let’s look at some initialization log lines now:&lt;/p&gt;
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nlp-runner                | INFO :: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Discovery] :: Loading runner adapter members...
 nlp-runner                | INFO :: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Discovery] :: Found handlers: run_language_detection
@@ -562,7 +710,7 @@ nlp-runner                | INFO:     172.19.0.6:49054 - &lt;span class=&quot;s2
 controller                | INFO :: Received result from runner: &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'result'&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'language'&lt;/span&gt;: &lt;span class=&quot;s1&quot;&gt;'en'&lt;/span&gt;, &lt;span class=&quot;s1&quot;&gt;'probability'&lt;/span&gt;: 0.9998741149902344&lt;span class=&quot;o&quot;&gt;}}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;bonus-track&quot;&gt;Bonus track&lt;/h2&gt;
+&lt;h2 id=&quot;bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/h2&gt;
 
 &lt;p&gt;As we mentioned before, having dynamically generated Pydantic models for our algorithm handlers’ arguments in each of our runners, we can get automatically generated schemas for all supported algorithms. This can come in very handy when creating documentation, debugging and more. To take advantage of this, let’s simply expose a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/schemas&lt;/code&gt; endpoint in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;’s server application that invokes a new function exposed in its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;models&lt;/code&gt; module.&lt;/p&gt;
 
@@ -644,107 +792,37 @@ nlp-runner algorithm schemas:
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.&lt;/p&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Note</summary></entry><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="/2022/03/09/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>/2022/03/09/ml-on-lambda-two-practices</id><content type="html" xml:base="/2022/03/09/ml-on-lambda-two-practices.html">&lt;h2 id=&quot;observations&quot;&gt;Observations&lt;/h2&gt;
-
-&lt;p&gt;I’d like to share a pattern that emerged in my work deploying machine learning (or ML) inference Python code to AWS Lambda. To do this, first I’ll offer three observations. Then, we’ll derive two practices from those observations that you might want to consider for your own processes.&lt;/p&gt;
-
-&lt;h3 id=&quot;1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/h3&gt;
-&lt;p&gt;AWS Lambda can be a convenient way of deploying code to production for many use cases. Naturally, however, it also comes with limitations. In particular, its serverless and flexible nature implies a limitation regarding local storage: each Lambda execution environment gets a filesystem on an ephemeral storage space for it to use which is available under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and has a hard limit of 512 MB in size (see &lt;a href=&quot;https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html&quot;&gt;docs&lt;/a&gt;).&lt;/p&gt;
-
-&lt;h3 id=&quot;2-on-using-popular-ml-libraries&quot;&gt;2. On using popular ML libraries&lt;/h3&gt;
-
-&lt;p&gt;Popular ML libraries that offer pre-trained models (such as &lt;a href=&quot;https://huggingface.co/models&quot;&gt;Hugging Face&lt;/a&gt;, &lt;a href=&quot;https://github.com/openai/CLIP&quot;&gt;OpenAI’s CLIP&lt;/a&gt; or &lt;a href=&quot;https://github.com/JaidedAI/EasyOCR&quot;&gt;JaidedAI’s EasyOCR&lt;/a&gt;) commonly use your filesystem to download models to and to use as cache. Further, these libraries may differ in the default filesystem paths they’d use as cache, but they usually expose a way to configure the paths they’ll use. On the other hand, as far as I can tell at this point in time, they don’t usually offer a way to stream models into RAM. Using your filesystem as a means for caching models is convenient for one’s process since it allows for a smoother iteration on code development, but it also means you’re forced to rely on a filesystem, and one with sufficient available space, to be able to get your models downloaded.&lt;/p&gt;
-
-&lt;p&gt;Also quite common is for single models or the conjunction of several models used in an inference program to exceed 512 MB.&lt;/p&gt;
-
-&lt;h3 id=&quot;3-on-downloading-objects-from-s3&quot;&gt;3. On downloading objects from S3&lt;/h3&gt;
-
-&lt;p&gt;When you need to get an object from S3, you often just need to download it to disk. This seems intuitive and easy, and is a common practice. You may even do this when you only need the object in RAM, by downloading it first to your filesystem and then loading it into your program from there:&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'my-bucket'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'my_file.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'temp_my_file.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'w'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download_fileobj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;# do something with temp_my_file.txt, remember to delete it if appropriate.
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;However, if you’re going to download the S3 object to disk only to then load and use it in RAM, then you’d probably prefer a way to get the object into RAM directly.&lt;/p&gt;
-
-&lt;h2 id=&quot;deriving-practices&quot;&gt;Deriving practices&lt;/h2&gt;
-
-&lt;p&gt;Deploying ML inference code is a worthy use case for Lambda. But, in light of popular libraries relying on disk space for getting you pre-trained models, if you use enough of these then your lambdas are liable to eventually run into the 512 MB limit. This would be the case even if you don’t download pre-trained models but you do rely on getting models (either pre-downloaded, trained by you or whatever the case may be) from a remote storage service with which you’re interacting in a similar way to what I showed before with S3.&lt;/p&gt;
-
-&lt;p&gt;So, to solve this potential and likely issue, two good practices you may want to adopt follow.&lt;/p&gt;
-
-&lt;h3 id=&quot;1-make-libraries-on-disk-cache-path-configurable-by-environment&quot;&gt;1. Make libraries’ on-disk cache path configurable by environment&lt;/h3&gt;
-
-&lt;p&gt;Either on a model-by-model basis or for all of your library-downloaded models, leverage these libraries’ options to configure cache paths and use environment variables to set them. If you work with a separate ML team that writes your Lambda-bound code, encourage them to adopt this practice on your behalf. That way, when you deploy your code to Lambda, you’ll be able to easily have those paths stem from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and to avoid “read-only filesystem” errors coming from your libraries attempting to write to off-limits paths. This won’t save you from running into the storage space limit, but it will make deployment easier while your space usage is within bounds.&lt;/p&gt;
-
-&lt;p&gt;To view this in an example, let’s assume our code uses CLIP’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ViT-B/32&lt;/code&gt; and Hugging Face’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bert-base-cased&lt;/code&gt;. This means our code at a certain point might include some lines like:&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;clip&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;transformers&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;preprocess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ViT-B/32'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;bert&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_pretrained&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'bert-base-cased'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The default cache dirs used by &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;clip&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;transformers&lt;/code&gt; in these function calls are (at this point in time) under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache&lt;/code&gt;, namely &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache/torch/transformers&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cache/clip&lt;/code&gt; respectively. To adopt this practice, you’d set something like a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MODEL_CACHE_FS_PATH&lt;/code&gt; environment variable to a path starting with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/tmp&lt;/code&gt; and use those libraries’ cache path configuration options:&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;clip&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;transformers&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;environ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'MODEL_CACHE_FS_PATH'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'./cache'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;preprocess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ViT-B/32'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;download_root&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;bert&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BertModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;from_pretrained&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'bert-base-cased'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache_dir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configured_cache_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;use-s3-to-store-models-and-stream-them-into-ram&quot;&gt;Use S3 to store models and stream them into RAM&lt;/h3&gt;
-
-&lt;p&gt;Once your library-downloaded models (or other large files you may need) conspire to exceed the 512 MB to your lambdas, you’ll need a way to download them that does not require a filesystem. S3 is indeed a good option, since it does offer an easy way to stream objects directly to RAM. If you’re deploying Python code to Lambda, this is very easy to do using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;boto3&lt;/code&gt;. The way you might take advantage of this option is to pre-download the models you’ve been getting through your libraries’ API, serialize them (e.g by using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pickle&lt;/code&gt; or library-specific serialization APIs), upload the serialized files to S3 and then fetch those objects in your Lambda-bound code in a way that gets them into RAM directly. Note, of course, that this is useful for models you get from other sources as well, such as the ones you train yourself.&lt;/p&gt;
-
-&lt;p&gt;To quickly look at an example for this, let’s assume we’re using PyTorch and you’ve pickled and uploaded the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;state_dict&lt;/code&gt; of an instance of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Model&lt;/code&gt; to S3 at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;models-bucket/model_state_dict.pkl&lt;/code&gt;. This is what your code might look like.&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;io&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;pickle&lt;/span&gt;
-
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;# Stream pickled `state_dict` into variable rather than save to disk
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;io&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BytesIO&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s3_resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'models-bucket'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'model_state_dict.pkl'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;s3_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;download_fileobj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;pickled_state_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bytes_stream&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getvalue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;# Load model
-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state_dict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pickle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loads&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pickled_state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load_state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state_dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;eval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-
-&lt;span class=&quot;c1&quot;&gt;# Have fun with model
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;a-final-note&quot;&gt;A final note&lt;/h3&gt;
-
-&lt;p&gt;Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.&lt;/p&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Observations</summary></entry><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part II</title><link href="/2022/03/02/plug-play-worker-pattern-2.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part II" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>/2022/03/02/plug-play-worker-pattern-2</id><content type="html" xml:base="/2022/03/02/plug-play-worker-pattern-2.html">&lt;hr /&gt;
+&lt;p&gt;To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 2/3 - Naïve Implementation</title><link href="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 2/3 - Naïve Implementation" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/02/extensible-worker-pattern-2</id><content type="html" xml:base="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part II&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - use case, pattern concepts&lt;/li&gt;
+  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
   &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
   &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#implementation&quot; id=&quot;markdown-toc-implementation&quot;&gt;Implementation&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#controller&quot; id=&quot;markdown-toc-controller&quot;&gt;Controller&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#classifier&quot; id=&quot;markdown-toc-classifier&quot;&gt;Classifier&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#dockerization-compose-file&quot; id=&quot;markdown-toc-dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#controller-dockerfile&quot; id=&quot;markdown-toc-controller-dockerfile&quot;&gt;Controller Dockerfile&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#classifier-dockerfile&quot; id=&quot;markdown-toc-classifier-dockerfile&quot;&gt;Classifier Dockerfile&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#compose-file&quot; id=&quot;markdown-toc-compose-file&quot;&gt;Compose file&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#producer&quot; id=&quot;markdown-toc-producer&quot;&gt;Producer&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#testing-it-out&quot; id=&quot;markdown-toc-testing-it-out&quot;&gt;Testing it out&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#whats-next&quot; id=&quot;markdown-toc-whats-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
@@ -760,7 +838,7 @@ nlp-runner algorithm schemas:
 
 &lt;p&gt;In Part II, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.&lt;/p&gt;
 
-&lt;h3 id=&quot;a-note-on-implementation-and-code-structure&quot;&gt;A note on implementation and code structure&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;A note on implementation and code structure&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;As explained in Part I, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example &lt;a href=&quot;https://github.com/shaiperson/worker-pattern-article&quot;&gt;this GitHub repo&lt;/a&gt;. Code for the initial design presented here is available in branch &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initial&lt;/code&gt;.&lt;/p&gt;
 
@@ -979,18 +1057,37 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;h2 id=&quot;whats-next&quot;&gt;What’s Next&lt;/h2&gt;
 
-&lt;p&gt;In Part III of the series, we’ll implement the final pattern presented in Part I and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.&lt;/p&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Note</summary></entry><entry><title type="html">Plug &amp;amp; Play Worker Pattern - Part I</title><link href="/2022/02/15/plug-play-worker-pattern-1.html" rel="alternate" type="text/html" title="Plug &amp;amp; Play Worker Pattern - Part I" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>/2022/02/15/plug-play-worker-pattern-1</id><content type="html" xml:base="/2022/02/15/plug-play-worker-pattern-1.html">&lt;hr /&gt;
+&lt;p&gt;In Part III of the series, we’ll implement the final pattern presented in Part I and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 1/3 - Theory</title><link href="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 1/3 - Theory" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>http://localhost:4000/2022/02/15/extensible-worker-pattern-1</id><content type="html" xml:base="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This is &lt;strong&gt;Part I&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - use case, pattern concepts&lt;/li&gt;
+  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
   &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
   &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#tldr&quot; id=&quot;markdown-toc-tldr&quot;&gt;tl;dr&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#a-note-on-languages&quot; id=&quot;markdown-toc-a-note-on-languages&quot;&gt;A note on languages&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-case&quot; id=&quot;markdown-toc-the-case&quot;&gt;The case&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#basic-worker&quot; id=&quot;markdown-toc-basic-worker&quot;&gt;Basic worker&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-need-to-extend&quot; id=&quot;markdown-toc-the-need-to-extend&quot;&gt;The need to extend&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#re-designing-for-extensibility&quot; id=&quot;markdown-toc-re-designing-for-extensibility&quot;&gt;Re-designing for extensibility&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#naïve-extension&quot; id=&quot;markdown-toc-naïve-extension&quot;&gt;Naïve extension&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-goal&quot; id=&quot;markdown-toc-the-goal&quot;&gt;The goal&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#the-pattern&quot; id=&quot;markdown-toc-the-pattern&quot;&gt;The pattern&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#whats-next&quot; id=&quot;markdown-toc-whats-next&quot;&gt;What’s Next&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
@@ -1107,7 +1204,7 @@ meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Click &lt;a href=&quot;/2022/03/02/plug-play-worker-pattern-2.html&quot;&gt;here&lt;/a&gt; for Part II.&lt;/p&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">Note</summary></entry><entry><title type="html">ML Ops: A Fictional Case Study</title><link href="/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="/2021/12/04/ml-ops-fict-1.html">&lt;p&gt;In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
+&lt;p&gt;Click &lt;a href=&quot;/2022/03/02/plug-play-worker-pattern-2.html&quot;&gt;here&lt;/a&gt; for Part II.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">ML Ops: A Fictional Case Study</title><link href="http://localhost:4000/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>http://localhost:4000/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="http://localhost:4000/2021/12/04/ml-ops-fict-1.html">&lt;p&gt;In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-case&quot;&gt;The case&lt;/h2&gt;
 
@@ -1203,4 +1300,4 @@ controller         | INFO :: Received result from runner: {'label': 'math_lady',
 &lt;!--[Encontrar la manera de mencionar otros features que se desprenden de tener algo así como el poder trackear historial de modelos (para e.g eventualmente decidirse por cambio de arquitectura de red), versionado y rollbacks, sandboxing para experimentar etc, cálculo de métricas subseleccionando features de la data.]--&gt;
 &lt;!--[Sugerir al final somehow que el producto no está terminado y veríamos qué necesidades tiene cada cliente?]--&gt;
 &lt;!--[Que quede claro que el punto es que las necesidades específicas o idiosincráticas no tardan en aparecer ni tampoco lo hace la multiplicidad de modelos.]--&gt;
-&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name></name></author><category term="ml-ops" /><category term="tech" /><summary type="html">In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.</summary></entry></feed>
+&lt;!--[btw, in case you were wondering, Riley is now CTO porque la promocionaron por tomar buenas decision como contratarnos :P]--&gt;</content><author><name></name></author><summary type="html">In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.</summary></entry></feed>
