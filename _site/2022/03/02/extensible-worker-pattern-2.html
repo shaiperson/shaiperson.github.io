@@ -3,9 +3,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Extensible Worker Pattern 2/3 - Naïve Implementation | Blog</title>
+<title>Extensible Worker Pattern 2/3 | Blog</title>
 <meta name="generator" content="Jekyll v4.2.1" />
-<meta property="og:title" content="Extensible Worker Pattern 2/3 - Naïve Implementation" />
+<meta property="og:title" content="Extensible Worker Pattern 2/3" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
@@ -15,9 +15,9 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-03-02T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Extensible Worker Pattern 2/3 - Naïve Implementation" />
+<meta property="twitter:title" content="Extensible Worker Pattern 2/3" />
 <script type="application/ld+json">
-{"datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html"},"url":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html","description":"Note","headline":"Extensible Worker Pattern 2/3 - Naïve Implementation","dateModified":"2022-03-02T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-03-02T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html"},"url":"http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html","description":"Note","headline":"Extensible Worker Pattern 2/3","dateModified":"2022-03-02T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -40,7 +40,7 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 2/3 - Naïve Implementation</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 2/3</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2022-03-02T12:55:00-03:00" itemprop="datePublished">Mar 2, 2022
       </time></p>
@@ -50,12 +50,12 @@
     <hr />
 <p><strong>Note</strong></p>
 
-<p>This is <strong>Part II</strong> of a three-part series.</p>
+<p>This is <strong>Part 2</strong> of a three-part series.</p>
 
 <ul>
-  <li>Part I - pattern motivation and theory</li>
-  <li>Part II - naïve implementation</li>
-  <li>Part III - pattern implementation</li>
+  <li>Part 1 - pattern motivation and theory</li>
+  <li>Part 2 - naïve implementation</li>
+  <li>Part 3 - pattern implementation</li>
 </ul>
 
 <hr />
@@ -81,9 +81,9 @@
 
 <h2 id="introduction">Introduction</h2>
 
-<p>Let’s quickly review Part I of the series.</p>
+<p>Let’s quickly review Part 1 of the series.</p>
 
-<p>In Part I, we:</p>
+<p>In Part 1, we:</p>
 <ul>
   <li>Made the case for extensibility as a quality attribute to seek in designing algorithm-centric production workflows.</li>
   <li>Presented a fictional use case for a containerized analysis worker environment, a common kind of setup in real-world applications, that reads images from a queue and runs algorithms on them.</li>
@@ -91,17 +91,17 @@
   <li>Analyzed what made the initial design less extensible and used our conclusions to come up with a design pattern that solves for extensibility.</li>
 </ul>
 
-<p>In Part II, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.</p>
+<p>In Part 2, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part 3 where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.</p>
 
 <p><strong>A note on implementation and code structure</strong></p>
 
-<p>As explained in Part I, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example <a href="https://github.com/shaiperson/worker-pattern-article">this GitHub repo</a>. Code for the initial design presented here is available in branch <code class="language-plaintext highlighter-rouge">initial</code>.</p>
+<p>As explained in Part 1, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example <a href="https://github.com/shaiperson/worker-pattern-article">this GitHub repo</a>. Code for the initial design presented here is available in branch <code class="language-plaintext highlighter-rouge">initial</code>.</p>
 
 <p>The code for all components is placed in a single repository. Looking at the repo, you’ll find a directory for each component with its source files, Dockerfile and a <code class="language-plaintext highlighter-rouge">build.sh </code> script. The <code class="language-plaintext highlighter-rouge">worker</code> and <code class="language-plaintext highlighter-rouge">producer</code> directories are there to assist in running and testing everything locally.</p>
 
 <h2 id="implementation">Implementation</h2>
 
-<p>To quickly review Part I, the initial design we’ll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.</p>
+<p>To quickly review Part 1, the initial design we’ll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.</p>
 
 <p><img src="/assets/plug-play-worker-pattern-part-1/Untitled.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" /></p>
 
@@ -312,7 +312,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 <h2 id="whats-next">What’s Next</h2>
 
-<p>In Part III of the series, we’ll implement the final pattern presented in Part I and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.</p>
+<p>In Part 3 of the series, we’ll implement the final pattern presented in Part 1 and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.</p>
 
   </div><a class="u-url" href="/2022/03/02/extensible-worker-pattern-2.html" hidden></a>
 </article>

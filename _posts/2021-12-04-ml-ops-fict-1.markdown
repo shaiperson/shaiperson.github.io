@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "ML Ops: A Fictional Case Study"
+subtitle: "A made-up social network and its very real ML Ops problem"
 date: 2021-12-04 12:14:00 -0300
 highlights:
   - ML Ops

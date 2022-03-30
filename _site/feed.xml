@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-29T21:48:14-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/28/ml-on-lambda-two-practices</id><content type="html" xml:base="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html">&lt;ul id=&quot;markdown-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-03-30T00:59:11-03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/28/ml-on-lambda-two-practices</id><content type="html" xml:base="http://localhost:4000/2022/03/28/ml-on-lambda-two-practices.html">&lt;ul id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#observations&quot; id=&quot;markdown-toc-observations&quot;&gt;Observations&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#1-on-lambda-and-its-filesystem-feature&quot; id=&quot;markdown-toc-1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/a&gt;&lt;/li&gt;
@@ -105,15 +105,15 @@
 
 &lt;h3 id=&quot;a-final-note&quot;&gt;A final note&lt;/h3&gt;
 
-&lt;p&gt;Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.&lt;/p&gt;</content><author><name></name></author></entry><entry><title type="html">Extensible Worker Pattern 3/3 - Complete Implementation</title><link href="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 3/3 - Complete Implementation" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/09/extensible-worker-pattern-3</id><content type="html" xml:base="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html">&lt;hr /&gt;
+&lt;p&gt;Streaming objects from S3 into RAM is nothing new nor is it too much of an obscure functionality if you look at the docs. However, it seems worth highlighting in the particular context of deploying ML code to Lambda. This is an increasingly popular go-to for ML deployment, and these practices easily solve an issue that anyone starting to adopt Lambda for ML is bound to encounter.&lt;/p&gt;</content><author><name></name></author></entry><entry><title type="html">Extensible Worker Pattern 3/3</title><link href="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 3/3" /><published>2022-03-09T12:55:00-03:00</published><updated>2022-03-09T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/09/extensible-worker-pattern-3</id><content type="html" xml:base="http://localhost:4000/2022/03/09/extensible-worker-pattern-3.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;This is &lt;strong&gt;Part III&lt;/strong&gt; of a three-part series.&lt;/p&gt;
+&lt;p&gt;This is &lt;strong&gt;Part 3&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
-  &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
-  &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
+  &lt;li&gt;Part 1 - pattern motivation and theory&lt;/li&gt;
+  &lt;li&gt;Part 2 - naïve implementation&lt;/li&gt;
+  &lt;li&gt;Part 3 - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
@@ -123,43 +123,44 @@
   &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#implementation&quot; id=&quot;markdown-toc-implementation&quot;&gt;Implementation&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#runner-discovery&quot; id=&quot;markdown-toc-runner-discovery&quot;&gt;Runner Discovery&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#adapting-the-runners&quot; id=&quot;markdown-toc-adapting-the-runners&quot;&gt;Adapting the runners&lt;/a&gt;        &lt;ul&gt;
-          &lt;li&gt;&lt;a href=&quot;#environment-related-code&quot; id=&quot;markdown-toc-environment-related-code&quot;&gt;Environment-related code&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#complying-with-the-adapter-convention&quot; id=&quot;markdown-toc-complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#packaging-runners&quot; id=&quot;markdown-toc-packaging-runners&quot;&gt;Packaging runners&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#adapting-the-runners&quot; id=&quot;markdown-toc-adapting-the-runners&quot;&gt;Adapting the runners&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot; id=&quot;markdown-toc-like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot;&gt;Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#environment-related-code&quot; id=&quot;markdown-toc-environment-related-code&quot;&gt;Environment-related code&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#complying-with-the-adapter-convention&quot; id=&quot;markdown-toc-complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#packaging-runners&quot; id=&quot;markdown-toc-packaging-runners&quot;&gt;Packaging runners&lt;/a&gt;&lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#adapting-the-controller&quot; id=&quot;markdown-toc-adapting-the-controller&quot;&gt;Adapting the controller&lt;/a&gt;&lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#dockerization-compose-file&quot; id=&quot;markdown-toc-dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/a&gt;&lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#quick-test&quot; id=&quot;markdown-toc-quick-test&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#adding-some-algorithms&quot; id=&quot;markdown-toc-adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/a&gt;    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;#in-an-existing-runner-container&quot; id=&quot;markdown-toc-in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/a&gt;        &lt;ul&gt;
-          &lt;li&gt;&lt;a href=&quot;#algorithm-code&quot; id=&quot;markdown-toc-algorithm-code&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#algorithm-integration&quot; id=&quot;markdown-toc-algorithm-integration&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#quick-test-1&quot; id=&quot;markdown-toc-quick-test-1&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#adding-some-algorithms&quot; id=&quot;markdown-toc-adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#in-an-existing-runner-container&quot; id=&quot;markdown-toc-in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/a&gt;            &lt;ul&gt;
+              &lt;li&gt;&lt;a href=&quot;#algorithm-code&quot; id=&quot;markdown-toc-algorithm-code&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=&quot;#algorithm-integration&quot; id=&quot;markdown-toc-algorithm-integration&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=&quot;#quick-test-1&quot; id=&quot;markdown-toc-quick-test-1&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#in-a-new-runner-container&quot; id=&quot;markdown-toc-in-a-new-runner-container&quot;&gt;In a new runner container&lt;/a&gt;            &lt;ul&gt;
+              &lt;li&gt;&lt;a href=&quot;#algorithm-code-1&quot; id=&quot;markdown-toc-algorithm-code-1&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=&quot;#algorithm-integration-1&quot; id=&quot;markdown-toc-algorithm-integration-1&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+              &lt;li&gt;&lt;a href=&quot;#quick-test-2&quot; id=&quot;markdown-toc-quick-test-2&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+          &lt;/li&gt;
         &lt;/ul&gt;
       &lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#in-a-new-runner-container&quot; id=&quot;markdown-toc-in-a-new-runner-container&quot;&gt;In a new runner container&lt;/a&gt;        &lt;ul&gt;
-          &lt;li&gt;&lt;a href=&quot;#algorithm-code-1&quot; id=&quot;markdown-toc-algorithm-code-1&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#algorithm-integration-1&quot; id=&quot;markdown-toc-algorithm-integration-1&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#quick-test-2&quot; id=&quot;markdown-toc-quick-test-2&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#bonus-free-schemas-&quot; id=&quot;markdown-toc-bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#bonus-free-schemas-&quot; id=&quot;markdown-toc-bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;In this article series, we develop a design pattern for worker environments that run algorithms on data. The goal of the pattern is to make the environment easily extensible with new algorithms.&lt;/p&gt;
 
-&lt;p&gt;In Part I we developed the theory for the pattern, starting from an initial, naïve implementation of a worker environment that does not take extensibility into account, building all the way up to a pattern that attempts to optimize for that property. To also build up to the pattern in the technical realm, we implemented the initial design in Part II to use as a basis for implementing the final design.&lt;/p&gt;
+&lt;p&gt;In Part 1 we developed the theory for the pattern, starting from an initial, naïve implementation of a worker environment that does not take extensibility into account, building all the way up to a pattern that attempts to optimize for that property. To also build up to the pattern in the technical realm, we implemented the initial design in Part 2 to use as a basis for implementing the final design.&lt;/p&gt;
 
-&lt;p&gt;Here, in Part III, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and, hopefully, enjoy the fruits of our labor.&lt;/p&gt;
+&lt;p&gt;Here, in Part 3, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and, hopefully, enjoy the fruits of our labor.&lt;/p&gt;
 
 &lt;h2 id=&quot;implementation&quot;&gt;Implementation&lt;/h2&gt;
 
@@ -195,7 +196,7 @@
 
 &lt;p&gt;Taking from the concepts we laid out in Part I, this functionality is what endows our environment with a &lt;em&gt;dynamic mapping&lt;/em&gt; of algorithms to runners.&lt;/p&gt;
 
-&lt;p&gt;As in Part II, we’ll leverage FastAPI to write a succinct definition of our API and use Uvicorn to run it.&lt;/p&gt;
+&lt;p&gt;As in Part 2, we’ll leverage FastAPI to write a succinct definition of our API and use Uvicorn to run it.&lt;/p&gt;
 
 &lt;p&gt;The model for registration requests consists simply of an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;{algorithm, host}&lt;/code&gt; pair with the name of an algorithm and the URI of the runner it can be found on.&lt;/p&gt;
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;uvicorn&lt;/span&gt;
@@ -227,7 +228,7 @@
 
 &lt;p&gt;As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.&lt;/p&gt;
 
-&lt;p&gt;Like we hinted at in Part I when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/p&gt;
+&lt;h1 id=&quot;like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot;&gt;Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/h1&gt;
 
 &lt;p&gt;Working with Python, the way we’ll do this is to develop a separate Python project that takes care of all environment-related work. We’ll then package that project as a dependency that can be installed in each runner container using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip&lt;/code&gt;. This package will be called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;.&lt;/p&gt;
 
@@ -389,7 +390,7 @@ for name, handler in handlers_by_algorithm.items():
 
 &lt;h4 id=&quot;complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/h4&gt;
 
-&lt;p&gt;To comply with the convention we came up with for runners to integrate with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;, we just need to create a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt; module in each algorithm-running project. By following the convention’s four requirements, we get the following very simple module code. The algorithm name being &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;meme_classifier&lt;/code&gt;, we define a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;run_meme_classifier&lt;/code&gt; handler function with a JSON-friendly argument in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;image_url&lt;/code&gt; that is enough to run the algorithm. We also return a result that upstream concerns can convert to JSON. This handler calls the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;run_on_url&lt;/code&gt; function we saw in Part II, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.&lt;/p&gt;
+&lt;p&gt;To comply with the convention we came up with for runners to integrate with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;, we just need to create a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt; module in each algorithm-running project. By following the convention’s four requirements, we get the following very simple module code. The algorithm name being &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;meme_classifier&lt;/code&gt;, we define a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;run_meme_classifier&lt;/code&gt; handler function with a JSON-friendly argument in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;image_url&lt;/code&gt; that is enough to run the algorithm. We also return a result that upstream concerns can convert to JSON. This handler calls the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;run_on_url&lt;/code&gt; function we saw in Part 2, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.&lt;/p&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# runner_adapter.py
 &lt;/span&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;classifier&lt;/span&gt;
@@ -429,7 +430,7 @@ for name, handler in handlers_by_algorithm.items():
 
 &lt;h3 id=&quot;dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/h3&gt;
 
-&lt;p&gt;Not much changes in the Dockerfiles we already went over in the Part II, save an addition to the runner’s that installs &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;. Note the context from which we run the build is now at the repo’s top level where it can reach both the runner code and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;’s code.&lt;/p&gt;
+&lt;p&gt;Not much changes in the Dockerfiles we already went over in the Part 2, save an addition to the runner’s that installs &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;. Note the context from which we run the build is now at the repo’s top level where it can reach both the runner code and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;’s code.&lt;/p&gt;
 
 &lt;div class=&quot;language-dockerfile highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./runnerlib /opt/lib/runnerlib&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /opt/lib/runnerlib&lt;/span&gt;
@@ -477,7 +478,7 @@ for name, handler in handlers_by_algorithm.items():
 
 &lt;h3 id=&quot;quick-test&quot;&gt;Quick test&lt;/h3&gt;
 
-&lt;p&gt;Let’s run the same example as in Part II, just to replicate the same usage and see that it still works.&lt;/p&gt;
+&lt;p&gt;Let’s run the same example as in Part 2, just to replicate the same usage and see that it still works.&lt;/p&gt;
 
 &lt;p&gt;First, here are a few logs line from the environment initialization to see how it’s looking now. We can see the interactions between the runner looking for algorithm handlers in the runner’s adapter module, the runner registering the algorithms it found and the controller discovering them by querying the Discovery component.&lt;/p&gt;
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;...
@@ -513,7 +514,7 @@ controller                | INFO :: Received result from runner: &lt;span class=
 
 &lt;p&gt;We couldn’t end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.&lt;/p&gt;
 
-&lt;p&gt;You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let’s actually add some algorithms in that same vain.&lt;/p&gt;
+&lt;p&gt;You might remember that, in Part 1, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let’s actually add some algorithms in that same vain.&lt;/p&gt;
 
 &lt;h3 id=&quot;in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/h3&gt;
 
@@ -525,7 +526,7 @@ controller                | INFO :: Received result from runner: &lt;span class=
 
 &lt;h4 id=&quot;algorithm-integration&quot;&gt;Algorithm integration&lt;/h4&gt;
 
-&lt;p&gt;Let’s also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).&lt;/p&gt;
+&lt;p&gt;Let’s also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part 1, so feel free to take a look at that in more detail).&lt;/p&gt;
 
 &lt;p&gt;So, all we have to do is to create an algorithm-running module and an algorithm request handler in the container’s &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt;. And that’s it! Once it’s listed in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runner_adapter&lt;/code&gt;, our environment setup will automatically find it and make it discoverable by the Controller. Of course, if a new algorithm also has new dependencies, then those need to be added to the build process as well; however, this naturally is inevitable and will be necessary when extending an environment with new algorithms in virtually any way or using any pattern.&lt;/p&gt;
 
@@ -792,15 +793,15 @@ nlp-runner algorithm schemas:
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 2/3 - Naïve Implementation</title><link href="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 2/3 - Naïve Implementation" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/02/extensible-worker-pattern-2</id><content type="html" xml:base="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html">&lt;hr /&gt;
+&lt;p&gt;To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 2/3</title><link href="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 2/3" /><published>2022-03-02T12:55:00-03:00</published><updated>2022-03-02T12:55:00-03:00</updated><id>http://localhost:4000/2022/03/02/extensible-worker-pattern-2</id><content type="html" xml:base="http://localhost:4000/2022/03/02/extensible-worker-pattern-2.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;This is &lt;strong&gt;Part II&lt;/strong&gt; of a three-part series.&lt;/p&gt;
+&lt;p&gt;This is &lt;strong&gt;Part 2&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
-  &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
-  &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
+  &lt;li&gt;Part 1 - pattern motivation and theory&lt;/li&gt;
+  &lt;li&gt;Part 2 - naïve implementation&lt;/li&gt;
+  &lt;li&gt;Part 3 - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
@@ -826,9 +827,9 @@ nlp-runner algorithm schemas:
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
-&lt;p&gt;Let’s quickly review Part I of the series.&lt;/p&gt;
+&lt;p&gt;Let’s quickly review Part 1 of the series.&lt;/p&gt;
 
-&lt;p&gt;In Part I, we:&lt;/p&gt;
+&lt;p&gt;In Part 1, we:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Made the case for extensibility as a quality attribute to seek in designing algorithm-centric production workflows.&lt;/li&gt;
   &lt;li&gt;Presented a fictional use case for a containerized analysis worker environment, a common kind of setup in real-world applications, that reads images from a queue and runs algorithms on them.&lt;/li&gt;
@@ -836,17 +837,17 @@ nlp-runner algorithm schemas:
   &lt;li&gt;Analyzed what made the initial design less extensible and used our conclusions to come up with a design pattern that solves for extensibility.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;In Part II, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.&lt;/p&gt;
+&lt;p&gt;In Part 2, we’ll go through implementing the naïve design. This is useful mostly as a precursor to Part 3 where we’ll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we’ll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;A note on implementation and code structure&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;As explained in Part I, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example &lt;a href=&quot;https://github.com/shaiperson/worker-pattern-article&quot;&gt;this GitHub repo&lt;/a&gt;. Code for the initial design presented here is available in branch &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initial&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;As explained in Part 1, we’ll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example &lt;a href=&quot;https://github.com/shaiperson/worker-pattern-article&quot;&gt;this GitHub repo&lt;/a&gt;. Code for the initial design presented here is available in branch &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initial&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;The code for all components is placed in a single repository. Looking at the repo, you’ll find a directory for each component with its source files, Dockerfile and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;build.sh &lt;/code&gt; script. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;worker&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;producer&lt;/code&gt; directories are there to assist in running and testing everything locally.&lt;/p&gt;
 
 &lt;h2 id=&quot;implementation&quot;&gt;Implementation&lt;/h2&gt;
 
-&lt;p&gt;To quickly review Part I, the initial design we’ll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.&lt;/p&gt;
+&lt;p&gt;To quickly review Part 1, the initial design we’ll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/plug-play-worker-pattern-part-1/Untitled.png&quot; style=&quot;display: block; margin-left: auto; margin-right: auto; width: 30%;&quot; /&gt;&lt;/p&gt;
 
@@ -1057,15 +1058,15 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;h2 id=&quot;whats-next&quot;&gt;What’s Next&lt;/h2&gt;
 
-&lt;p&gt;In Part III of the series, we’ll implement the final pattern presented in Part I and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 1/3 - Theory</title><link href="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 1/3 - Theory" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>http://localhost:4000/2022/02/15/extensible-worker-pattern-1</id><content type="html" xml:base="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html">&lt;hr /&gt;
+&lt;p&gt;In Part 3 of the series, we’ll implement the final pattern presented in Part 1 and test it. We’ll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">Extensible Worker Pattern 1/3</title><link href="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html" rel="alternate" type="text/html" title="Extensible Worker Pattern 1/3" /><published>2022-02-15T12:55:00-03:00</published><updated>2022-02-15T12:55:00-03:00</updated><id>http://localhost:4000/2022/02/15/extensible-worker-pattern-1</id><content type="html" xml:base="http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html">&lt;hr /&gt;
 &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;This is &lt;strong&gt;Part I&lt;/strong&gt; of a three-part series.&lt;/p&gt;
+&lt;p&gt;This is &lt;strong&gt;Part 1&lt;/strong&gt; of a three-part series.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Part I - pattern motivation and theory&lt;/li&gt;
-  &lt;li&gt;Part II - naïve implementation&lt;/li&gt;
-  &lt;li&gt;Part III - pattern implementation&lt;/li&gt;
+  &lt;li&gt;Part 1 - pattern motivation and theory&lt;/li&gt;
+  &lt;li&gt;Part 2 - naïve implementation&lt;/li&gt;
+  &lt;li&gt;Part 3 - pattern implementation&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;hr /&gt;
@@ -1110,7 +1111,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;p&gt;For the pattern to be reasonable enough to implement, it might require a few things of the programming language you use for algorithms. The main such requirement is that the language has some sort of mechanism for “reflection” or “inspection”, like the built-in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;inspect&lt;/code&gt; module in Python. When this pattern started materializing itself in my work, Python was the only language I used for that, and so I can guarantee it will be very easy to code in Python. In any case, this it should be easy enough in any modern language.&lt;/p&gt;
 
-&lt;p&gt;In parts II &amp;amp; III we’ll look at a concrete Python implementation for everything presented here.&lt;/p&gt;
+&lt;p&gt;In parts 2 &amp;amp; 3 we’ll look at a concrete Python implementation for everything presented here.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-case&quot;&gt;The case&lt;/h2&gt;
 
@@ -1185,7 +1186,7 @@ controller         | INFO :: Received result from runner: {'label': 'matrix_morp
 
 &lt;p&gt;I submit, however, that this is a small price to pay, and it’s the offloading of mapping responsibility to this new component that gives us the discussed benefits of dynamic algorithm mapping. It’s true that those bits of added code need to be implemented and maintained, but they’re simple to implement and can be simple enough to maintain as well. First and foremost, they remain constant as a function of algorithm addition or removal, as they must be algorithm-agnostic by their very nature of providing dynamic mapping of algorithms. Furthermore, the controller’s bit which queries Runner Discovery can be added to and versioned with the very same controller code (thereby yielding “Controller*”), which means it lives in and affects that single source project alone.&lt;/p&gt;
 
-&lt;p&gt;If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment’s repertoir of algorithms. &lt;strong&gt;Spoiler alert&lt;/strong&gt;: it can also be made a lot easier by just coding both the “S” and “D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we’ll do in Part III.&lt;/p&gt;
+&lt;p&gt;If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment’s repertoir of algorithms. &lt;strong&gt;Spoiler alert&lt;/strong&gt;: it can also be made a lot easier by just coding both the “S” and “D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we’ll do in Part 3.&lt;/p&gt;
 
 &lt;p&gt;Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we’d just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we’d be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running code comply with the same convention, we’d just have to build and deploy the new container with the “D” and “S” code and we’d done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it’s ready to play.&lt;/p&gt;
 
@@ -1204,7 +1205,7 @@ meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Click &lt;a href=&quot;/2022/03/02/plug-play-worker-pattern-2.html&quot;&gt;here&lt;/a&gt; for Part II.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">ML Ops: A Fictional Case Study</title><link href="http://localhost:4000/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>http://localhost:4000/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="http://localhost:4000/2021/12/04/ml-ops-fict-1.html">&lt;p&gt;In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
+&lt;p&gt;Click &lt;a href=&quot;/2022/03/02/plug-play-worker-pattern-2.html&quot;&gt;here&lt;/a&gt; for Part 2.&lt;/p&gt;</content><author><name></name></author><summary type="html">Note</summary></entry><entry><title type="html">ML Ops: A Fictional Case Study</title><link href="http://localhost:4000/2021/12/04/ml-ops-fict-1.html" rel="alternate" type="text/html" title="ML Ops: A Fictional Case Study" /><published>2021-12-04T12:14:00-03:00</published><updated>2021-12-04T12:14:00-03:00</updated><id>http://localhost:4000/2021/12/04/ml-ops-fict-1</id><content type="html" xml:base="http://localhost:4000/2021/12/04/ml-ops-fict-1.html">&lt;p&gt;In this article, I’d like to walk you through how the incorporation of ML Ops practices might be of great assistance to an engineering team looking to apply ML to solve a problem.&lt;/p&gt;
 
 &lt;h2 id=&quot;the-case&quot;&gt;The case&lt;/h2&gt;
 

@@ -29,31 +29,29 @@ layout: default
     <ul class="post-list">
       {%- for post in site.posts -%}
       <li>
-          <div class="post-entry-inside">
         {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
 <!--        <span class="post-meta">{{ post.tags }}</span>-->
-        <h3 style="margin-bottom: 0.2em; margin-top: 0.5em;">
+        <h3 style="margin-bottom: 0.2em">
 <!--        <h3>-->
           <a class="post-link" href="{{ post.url | relative_url }}">
             {{ post.title | escape }}
           </a>
         </h3>
-          <div class="post-meta-section">
-            <div class="post-subtitle post-meta">{{ post.subtitle }}</div>
-            <div class="post-meta">
-              {% for hl in post.highlights %}
-              <span class="post-highlight">
-            <span class="post-highlight-content">
-              {{ hl }}
-            </span>
-          </span>
-              {% endfor %}
-          </div>
-          </div>
+<!--          <div class="post-meta">-->
+        <span class="post-subtitle">{{ post.subtitle }}</span>
+      <div>
+          {% for hl in post.highlights %}
+          <span class="post-highlight">
+        <span class="post-highlight-content">
+          {{ hl }}
+        </span>
+      </span>
+          {% endfor %}
+      </div>
+<!--          </div>-->
         {%- if site.show_excerpts -%}
           {{ post.excerpt }}
         {%- endif -%}
-            </div>
       </li>
       {%- endfor -%}
     </ul>

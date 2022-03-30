@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Extensible Worker Pattern 1/3 - Theory"
-subtitle: "Motivation and theory for an extensible worker pod design pattern"
+title: "Extensible Worker Pattern 1/3"
+subtitle: "Motivation and theory for a worker design pattern geared towards extensibility"
 date: 2022-02-15 12:55:00 -0300
 highlights:
     - ML Ops
@@ -11,11 +11,11 @@ highlights:
 ---
 **Note**
 
-This is **Part I** of a three-part series.
+This is **Part 1** of a three-part series.
 
-- Part I - pattern motivation and theory
-- Part II - naïve implementation
-- Part III - pattern implementation
+- Part 1 - pattern motivation and theory
+- Part 2 - naïve implementation
+- Part 3 - pattern implementation
 
 ---
 
@@ -42,7 +42,7 @@ We'll dive right in with an example and build up to a pattern from scratch. We'l
 
 For the pattern to be reasonable enough to implement, it might require a few things of the programming language you use for algorithms. The main such requirement is that the language has some sort of mechanism for "reflection" or "inspection”, like the built-in `inspect` module in Python. When this pattern started materializing itself in my work, Python was the only language I used for that, and so I can guarantee it will be very easy to code in Python. In any case, this it should be easy enough in any modern language.
 
-In parts II & III we'll look at a concrete Python implementation for everything presented here.
+In parts 2 & 3 we'll look at a concrete Python implementation for everything presented here.
 
 ## The case
 
@@ -115,7 +115,7 @@ So, herein lies the catch: we add a discovery component to our setup and a bit o
 
 I submit, however, that this is a small price to pay, and it's the offloading of mapping responsibility to this new component that gives us the discussed benefits of dynamic algorithm mapping. It's true that those bits of added code need to be implemented and maintained, but they're simple to implement and can be simple enough to maintain as well. First and foremost, they remain constant as a function of algorithm addition or removal, as they must be algorithm-agnostic by their very nature of providing dynamic mapping of algorithms. Furthermore, the controller's bit which queries Runner Discovery can be added to and versioned with the very same controller code (thereby yielding "Controller*"), which means it lives in and affects that single source project alone.
 
-If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment's repertoir of algorithms. **Spoiler alert**: it can also be made a lot easier by just coding both the "S” and "D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we'll do in Part III.
+If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment's repertoir of algorithms. **Spoiler alert**: it can also be made a lot easier by just coding both the "S” and "D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we'll do in Part 3.
 
 Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we'd just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we'd be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running code comply with the same convention, we'd just have to build and deploy the new container with the "D" and "S" code and we'd done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it's ready to play.
 
@@ -135,4 +135,4 @@ meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 ```
 
-Click [here](/2022/03/02/plug-play-worker-pattern-2.html) for Part II.
+Click [here](/2022/03/02/plug-play-worker-pattern-2.html) for Part 2.

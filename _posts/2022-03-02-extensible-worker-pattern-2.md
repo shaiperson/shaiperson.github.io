@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Extensible Worker Pattern 2/3 - Naïve Implementation"
-subtitle: "A meme classifier✨, Python, FastAPI and Docker"
+title: "Extensible Worker Pattern 2/3"
+subtitle: "A meme classifier and a naïve implementation of a worker environment to deploy it to"
 date: 2022-03-02 12:55:00 -0300
 highlights:
     - Python
@@ -13,11 +13,11 @@ highlights:
 ---
 **Note**
 
-This is **Part II** of a three-part series.
+This is **Part 2** of a three-part series.
 
-- Part I - pattern motivation and theory
-- Part II - naïve implementation
-- Part III - pattern implementation
+- Part 1 - pattern motivation and theory
+- Part 2 - naïve implementation
+- Part 3 - pattern implementation
 
 ---
 
@@ -28,25 +28,25 @@ This is **Part II** of a three-part series.
 
 ## Introduction
 
-Let's quickly review Part I of the series.
+Let's quickly review Part 1 of the series.
 
-In Part I, we:
+In Part 1, we:
 - Made the case for extensibility as a quality attribute to seek in designing algorithm-centric production workflows.
 - Presented a fictional use case for a containerized analysis worker environment, a common kind of setup in real-world applications, that reads images from a queue and runs algorithms on them.
 - Came up with an initial design the worker, naïve with respect to extensibility.
 - Analyzed what made the initial design less extensible and used our conclusions to come up with a design pattern that solves for extensibility. 
 
-In Part II, we'll go through implementing the naïve design. This is useful mostly as a precursor to Part III where we'll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we'll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.
+In Part 2, we'll go through implementing the naïve design. This is useful mostly as a precursor to Part 3 where we'll re-implement our worker using the final design pattern. By first having the initial design coded and functioning, we'll be able to apply the pattern to it, test that it still works and look at how much easier it is to extend in practical terms.
 
 **A note on implementation and code structure**
 
-As explained in Part I, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is available in branch `initial`. 
+As explained in Part 1, we'll implement everything in Python. I include some code snippets throughout the article tailored to aid discussion, but you can find the complete working code for the example [this GitHub repo](https://github.com/shaiperson/worker-pattern-article). Code for the initial design presented here is available in branch `initial`. 
 
 The code for all components is placed in a single repository. Looking at the repo, you'll find a directory for each component with its source files, Dockerfile and a `build.sh ` script. The `worker` and `producer` directories are there to assist in running and testing everything locally.
 
 ## Implementation
 
-To quickly review Part I, the initial design we'll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.
+To quickly review Part 1, the initial design we'll implement here consists of a Controller component that reads images from a queue and sends them to a Runner component. The latter houses the actual algorithm code, and exposes it on an auxiliary HTTP server for the controller to send requests to.
 
 <img src="/assets/plug-play-worker-pattern-part-1/Untitled.png" style="display: block; margin-left: auto; margin-right: auto; width: 30%;"/>
 
@@ -272,4 +272,4 @@ Looking good! You can play around some more with it if you like and have some fu
 
 ## What's Next
 
-In Part III of the series, we'll implement the final pattern presented in Part I and test it. We'll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.
+In Part 3 of the series, we'll implement the final pattern presented in Part 1 and test it. We'll then try to further extend our resulting setup with a new algorithm and see in practical terms if we achieved our goal of making it low-overhead and easy to do.

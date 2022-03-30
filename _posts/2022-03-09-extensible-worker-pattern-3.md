@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Extensible Worker Pattern 3/3 - Complete Implementation"
-subtitle: "Python, FastAPI and dynamic model generation using Pydantic"
+title: "Extensible Worker Pattern 3/3"
+subtitle: "Applying the full pattern and testing its extensibility"
 date: 2022-03-09 12:55:00 -0300
 highlights:
     - Python
@@ -12,11 +12,11 @@ highlights:
 ---
 **Note**
 
-This is **Part III** of a three-part series.
+This is **Part 3** of a three-part series.
 
-- Part I - pattern motivation and theory
-- Part II - naïve implementation
-- Part III - pattern implementation
+- Part 1 - pattern motivation and theory
+- Part 2 - naïve implementation
+- Part 3 - pattern implementation
 
 ---
 
@@ -28,9 +28,9 @@ This is **Part III** of a three-part series.
 
 In this article series, we develop a design pattern for worker environments that run algorithms on data. The goal of the pattern is to make the environment easily extensible with new algorithms.
 
-In Part I we developed the theory for the pattern, starting from an initial, naïve implementation of a worker environment that does not take extensibility into account, building all the way up to a pattern that attempts to optimize for that property. To also build up to the pattern in the technical realm, we implemented the initial design in Part II to use as a basis for implementing the final design.
+In Part 1 we developed the theory for the pattern, starting from an initial, naïve implementation of a worker environment that does not take extensibility into account, building all the way up to a pattern that attempts to optimize for that property. To also build up to the pattern in the technical realm, we implemented the initial design in Part 2 to use as a basis for implementing the final design.
 
-Here, in Part III, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and, hopefully, enjoy the fruits of our labor.
+Here, in Part 3, we code up the final form of the pattern. We then actually go ahead and add new algorithms to the environment in different ways to see the greater extensibility in action and, hopefully, enjoy the fruits of our labor.
 
 ## Implementation
 
@@ -62,7 +62,7 @@ This component has a single, simple responsibility: to function as a discovery s
 
 Taking from the concepts we laid out in Part I, this functionality is what endows our environment with a _dynamic mapping_ of algorithms to runners.
 
-As in Part II, we'll leverage FastAPI to write a succinct definition of our API and use Uvicorn to run it.
+As in Part 2, we'll leverage FastAPI to write a succinct definition of our API and use Uvicorn to run it.
 
 The model for registration requests consists simply of an `{algorithm, host}` pair with the name of an algorithm and the URI of the runner it can be found on.
 ```python
@@ -96,7 +96,7 @@ async def get_registry():
  
 As we've seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they're reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.
  
-Like we hinted at in Part I when going over the pattern's theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to _single-source_ those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they're automatically enhanced with those capabilities.
+# Like we hinted at in Part 1 when going over the pattern's theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to _single-source_ those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they're automatically enhanced with those capabilities.
  
 Working with Python, the way we'll do this is to develop a separate Python project that takes care of all environment-related work. We'll then package that project as a dependency that can be installed in each runner container using `pip`. This package will be called `runnerlib`.
 
@@ -264,7 +264,7 @@ Upon running `python -m runnerlib` in a runner container, that runner's algorith
 
 #### Complying with the adapter convention
 
-To comply with the convention we came up with for runners to integrate with `runnerlib`, we just need to create a `runner_adapter` module in each algorithm-running project. By following the convention's four requirements, we get the following very simple module code. The algorithm name being `meme_classifier`, we define a `run_meme_classifier` handler function with a JSON-friendly argument in `image_url` that is enough to run the algorithm. We also return a result that upstream concerns can convert to JSON. This handler calls the `run_on_url` function we saw in Part II, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.
+To comply with the convention we came up with for runners to integrate with `runnerlib`, we just need to create a `runner_adapter` module in each algorithm-running project. By following the convention's four requirements, we get the following very simple module code. The algorithm name being `meme_classifier`, we define a `run_meme_classifier` handler function with a JSON-friendly argument in `image_url` that is enough to run the algorithm. We also return a result that upstream concerns can convert to JSON. This handler calls the `run_on_url` function we saw in Part 2, which remains exactly the same, as well as the rest of the algorithm-running logic itself that is now encapsulated behind the adapter.
 
 ```python
 # runner_adapter.py
@@ -307,7 +307,7 @@ response = requests.request('POST', runner_uri, headers={'Content-Type': 'applic
 
 ### Dockerization, Compose File
 
-Not much changes in the Dockerfiles we already went over in the Part II, save an addition to the runner's that installs `runnerlib`. Note the context from which we run the build is now at the repo's top level where it can reach both the runner code and `runnerlib`'s code.
+Not much changes in the Dockerfiles we already went over in the Part 2, save an addition to the runner's that installs `runnerlib`. Note the context from which we run the build is now at the repo's top level where it can reach both the runner code and `runnerlib`'s code.
 
 ```dockerfile
 COPY ./runnerlib /opt/lib/runnerlib
@@ -358,7 +358,7 @@ controller:
 
 ### Quick test
 
-Let's run the same example as in Part II, just to replicate the same usage and see that it still works.
+Let's run the same example as in Part 2, just to replicate the same usage and see that it still works.
 
 First, here are a few logs line from the environment initialization to see how it's looking now. We can see the interactions between the runner looking for algorithm handlers in the runner's adapter module, the runner registering the algorithms it found and the controller discovering them by querying the Discovery component.
 ```
@@ -397,7 +397,7 @@ The controller sends its request for a run of the meme classifier at `http://mem
 
 We couldn't end our discussion of this pattern without really putting it to the test. Since its goal is to make the design easily extensible with new algorithms, the only way to see if it accomplishes this goal is to actually extend it and see how it goes.
 
-You might remember that, in Part I, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let's actually add some algorithms in that same vain. 
+You might remember that, in Part 1, we motivated designing the pattern by the example of a made-up image board company that decides to run a meme classifier on images posted to it by users. So, to make the test a bit more elegant, let's actually add some algorithms in that same vain. 
 
 ### In an existing runner container
 
@@ -409,7 +409,7 @@ For that, we'll use Google's [Tesseract OCR](https://github.com/tesseract-ocr/te
 
 #### Algorithm integration
 
-Let's also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part I, so feel free to take a look at that in more detail).
+Let's also say we want to run this new algorithm in the same container as our meme classifier. This might make sense, for example, if we want to develop a single project to capture all our image analysis concerns (we discussed different scenarios for adding algorithms into existing or in new containers in Part 1, so feel free to take a look at that in more detail).
 
 So, all we have to do is to create an algorithm-running module and an algorithm request handler in the container's `runner_adapter`. And that's it! Once it's listed in `runner_adapter`, our environment setup will automatically find it and make it discoverable by the Controller. Of course, if a new algorithm also has new dependencies, then those need to be added to the build process as well; however, this naturally is inevitable and will be necessary when extending an environment with new algorithms in virtually any way or using any pattern.
 

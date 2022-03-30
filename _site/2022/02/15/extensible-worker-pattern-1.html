@@ -3,9 +3,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
-<title>Extensible Worker Pattern 1/3 - Theory | Blog</title>
+<title>Extensible Worker Pattern 1/3 | Blog</title>
 <meta name="generator" content="Jekyll v4.2.1" />
-<meta property="og:title" content="Extensible Worker Pattern 1/3 - Theory" />
+<meta property="og:title" content="Extensible Worker Pattern 1/3" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
@@ -15,9 +15,9 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-02-15T12:55:00-03:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Extensible Worker Pattern 1/3 - Theory" />
+<meta property="twitter:title" content="Extensible Worker Pattern 1/3" />
 <script type="application/ld+json">
-{"datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html"},"url":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html","description":"Note","headline":"Extensible Worker Pattern 1/3 - Theory","dateModified":"2022-02-15T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"datePublished":"2022-02-15T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html"},"url":"http://localhost:4000/2022/02/15/extensible-worker-pattern-1.html","description":"Note","headline":"Extensible Worker Pattern 1/3","dateModified":"2022-02-15T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -40,7 +40,7 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 1/3 - Theory</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 1/3</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2022-02-15T12:55:00-03:00" itemprop="datePublished">Feb 15, 2022
       </time></p>
@@ -50,12 +50,12 @@
     <hr />
 <p><strong>Note</strong></p>
 
-<p>This is <strong>Part I</strong> of a three-part series.</p>
+<p>This is <strong>Part 1</strong> of a three-part series.</p>
 
 <ul>
-  <li>Part I - pattern motivation and theory</li>
-  <li>Part II - naïve implementation</li>
-  <li>Part III - pattern implementation</li>
+  <li>Part 1 - pattern motivation and theory</li>
+  <li>Part 2 - naïve implementation</li>
+  <li>Part 3 - pattern implementation</li>
 </ul>
 
 <hr />
@@ -100,7 +100,7 @@
 
 <p>For the pattern to be reasonable enough to implement, it might require a few things of the programming language you use for algorithms. The main such requirement is that the language has some sort of mechanism for “reflection” or “inspection”, like the built-in <code class="language-plaintext highlighter-rouge">inspect</code> module in Python. When this pattern started materializing itself in my work, Python was the only language I used for that, and so I can guarantee it will be very easy to code in Python. In any case, this it should be easy enough in any modern language.</p>
 
-<p>In parts II &amp; III we’ll look at a concrete Python implementation for everything presented here.</p>
+<p>In parts 2 &amp; 3 we’ll look at a concrete Python implementation for everything presented here.</p>
 
 <h2 id="the-case">The case</h2>
 
@@ -175,7 +175,7 @@
 
 <p>I submit, however, that this is a small price to pay, and it’s the offloading of mapping responsibility to this new component that gives us the discussed benefits of dynamic algorithm mapping. It’s true that those bits of added code need to be implemented and maintained, but they’re simple to implement and can be simple enough to maintain as well. First and foremost, they remain constant as a function of algorithm addition or removal, as they must be algorithm-agnostic by their very nature of providing dynamic mapping of algorithms. Furthermore, the controller’s bit which queries Runner Discovery can be added to and versioned with the very same controller code (thereby yielding “Controller*”), which means it lives in and affects that single source project alone.</p>
 
-<p>If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment’s repertoir of algorithms. <strong>Spoiler alert</strong>: it can also be made a lot easier by just coding both the “S” and “D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we’ll do in Part III.</p>
+<p>If we figure out a way to also single-source the runner bit of discovery-related initialization code, our goal of making our design low-overhead when extending with new algorithms will be achieved. This is certainly possible by taking a multi-stage build kind of approach as mentioned before for the auxiliary server, only lower in overhead in this case due to it not requiring updates and re-builds with each change to the environment’s repertoir of algorithms. <strong>Spoiler alert</strong>: it can also be made a lot easier by just coding both the “S” and “D” logic as a standalone Python package that simply discovers its runner code in a specified path in the filesystem and uses inspection to expose its algorithms on an HTTP server. This is what we’ll do in Part 3.</p>
 
 <p>Now, if we were to add a new algorithm to this improved setup and we wanted to deploy it inside one of the existing runners, we’d just expose it through the same convention used for existing algorithms, re-build and deploy that sole container and we’d be done. If we wanted to deploy it in a new container, in addition to having the algorithm-running code comply with the same convention, we’d just have to build and deploy the new container with the “D” and “S” code and we’d done. In either case, the new algorithm would be automatically discovered by the controller and ready to do work. You plug the new algorithm in, and it’s ready to play.</p>
 
@@ -194,7 +194,7 @@ meme-classifier    | INFO :: Running classifier on URL
 controller         | INFO :: Received result from runner: {'label': 'math_lady', 'score': 1.0}
 </code></pre></div></div>
 
-<p>Click <a href="/2022/03/02/plug-play-worker-pattern-2.html">here</a> for Part II.</p>
+<p>Click <a href="/2022/03/02/plug-play-worker-pattern-2.html">here</a> for Part 2.</p>
 
   </div><a class="u-url" href="/2022/02/15/extensible-worker-pattern-1.html" hidden></a>
 </article>
