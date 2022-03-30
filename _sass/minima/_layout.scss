@@ -257,11 +257,29 @@
   @include relative-font-size(1.5);
 }
 
-.post-like-button {
-  display: flex;
-  //flex-direction: row-reverse;
-  margin-right: 2em;
+.share-text {
+  font-size: 0.8em;
+  font-style: italic;
 }
+
+//.share-page {
+//  text-align: center;
+//  background: $secondary-color;
+//  color: $light-color;
+//  padding: 8px 15px;
+//  border-radius: 5px;
+//  margin: 1.5 * $spacing-unit 0;
+//
+//  a {
+//    font-weight: 700;
+//    color: #fff;
+//    margin-left: 10px;
+//
+//    &:hover {
+//      border-bottom: 1px dashed #fff;
+//    }
+//  }
+//}
 
 .masthead-container {
   display: flex;

@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WVFHPSW');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
@@ -9,17 +16,17 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="MS in Computer Science, freelance engineer and entrepreneur" />
 <meta property="og:description" content="MS in Computer Science, freelance engineer and entrepreneur" />
-<link rel="canonical" href="/ml-on-aws-lambda-two-practices" />
-<meta property="og:url" content="/ml-on-aws-lambda-two-practices" />
+<link rel="canonical" href="https://shaiperson.github.io/ml-on-aws-lambda-two-practices" />
+<meta property="og:url" content="https://shaiperson.github.io/ml-on-aws-lambda-two-practices" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2022-03-28T00:00:00-03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="ML on AWS Lambda: Two Practices" />
 <script type="application/ld+json">
-{"url":"/ml-on-aws-lambda-two-practices","mainEntityOfPage":{"@type":"WebPage","@id":"/ml-on-aws-lambda-two-practices"},"description":"MS in Computer Science, freelance engineer and entrepreneur","headline":"ML on AWS Lambda: Two Practices","dateModified":"2022-03-28T00:00:00-03:00","datePublished":"2022-03-28T00:00:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"url":"https://shaiperson.github.io/ml-on-aws-lambda-two-practices","mainEntityOfPage":{"@type":"WebPage","@id":"https://shaiperson.github.io/ml-on-aws-lambda-two-practices"},"description":"MS in Computer Science, freelance engineer and entrepreneur","headline":"ML on AWS Lambda: Two Practices","dateModified":"2022-03-28T00:00:00-03:00","datePublished":"2022-03-28T00:00:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /><!-- Global site tag (gtag.js) - Google Analytics -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://shaiperson.github.io/feed.xml" title="Blog" /><!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WCKF8CFPVZ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -29,7 +36,11 @@
   gtag('config', 'G-WCKF8CFPVZ');
 </script>
 </head>
-<body><header class="site-header" role="banner">
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WVFHPSW"
+                    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) --><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Blog</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
@@ -53,16 +64,139 @@
     <p class="post-meta">
       <time class="dt-published" datetime="2022-03-28T00:00:00-03:00" itemprop="datePublished">Mar 28, 2022
       </time></p>
-  </header>
+  </header><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<div id="share-bar">
 
-  <div class="post-like-button">
-    <!-- LikeBtn.com BEGIN -->
-    <span class="likebtn-wrapper" data-theme="youtube" data-i18n_like=" " data-identifier="item_1"></span>
-    <script>(function(d,e,s){if(d.getElementById("likebtn_wjs"))return;a=d.createElement(e);m=d.getElementsByTagName(e)[0];a.async=1;a.id="likebtn_wjs";a.src=s;m.parentNode.insertBefore(a, m)})(document,"script","//w.likebtn.com/js/w/widget.js");</script>
-    <!-- LikeBtn.com END -->
-    <br>
-    <br>
-  </div>
+    <div class="share-text">Feel free to share:</div>
+
+    <div class="share-buttons">
+        <a  href="https://www.facebook.com/sharer/sharer.php?u=https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Facebook" >
+            <i class="fa fa-facebook-official share-button"></i>
+        </a>
+
+        <a  href="https://twitter.com/intent/tweet?text=ML on AWS Lambda: Two Practices&url=https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Twitter" >
+            <i class="fa fa-twitter share-button"></i>
+        </a>
+
+        <a  href="http://pinterest.com/pin/create/button/?url=https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Pinterest" >
+            <i class="fa fa-pinterest-p share-button"></i>
+        </a>
+
+        <a  href="http://www.tumblr.com/share/link?url=https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Tumblr" >
+            <i class="fa fa-tumblr share-button"></i>
+        </a>
+
+        <a  href="http://www.reddit.com/submit?url=https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=900,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on Reddit" >
+            <i class="fa fa-reddit-alien share-button"></i>
+        </a>
+
+        <a  href="https://www.linkedin.com/shareArticle?mini=true&url=https://shaiperson.github.io/ml-on-aws-lambda-two-practices&title=ML on AWS Lambda: Two Practices&summary=&source=Blog"
+            onclick="window.open(this.href, 'pop-up', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;"
+            title="Share on LinkedIn" >
+            <i class="fa fa-linkedin share-button"></i>
+        </a>
+
+        <a  href="mailto:?subject=ML on AWS Lambda: Two Practices&amp;body=Check out this site https://shaiperson.github.io/ml-on-aws-lambda-two-practices"
+            title="Share via Email" >
+            <i class="fa fa-envelope share-button"></i>
+        </a>
+    </div>
+
+</div>
+<style type="text/css">
+    /* Share Bar */
+    #share-bar {
+        font-size: 20px;
+    }
+    /* Title */
+    #share-bar h4 {
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    /* All buttons */
+    .share-buttons {
+    }
+    /* Each button */
+    .share-button {
+        margin: 0px;
+        margin-bottom: 10px;
+        margin-right: 3px;
+        /*border: 1px solid #D3D6D2;*/
+        padding: 5px 10px 5px 10px;
+    }
+    .share-button:hover {
+        opacity: 1;
+        color: #ffffff;
+    }
+    /* Facebook button */
+    .fa-facebook-official {
+        color: #3b5998;
+    }
+    .fa-facebook-official:hover {
+        background-color: #3b5998;
+    }
+    /* Twitter button */
+    .fa-twitter {
+        color: #55acee;
+    }
+    .fa-twitter:hover {
+        background-color: #55acee;
+    }
+    /* Google-PLus button */
+    .fa-google-plus {
+        color: #dd4b39;
+    }
+    .fa-google-plus:hover {
+        background-color: #dd4b39;
+    }
+    /* Pinterest button */
+    .fa-pinterest-p {
+        color: #cb2027;
+    }
+    .fa-pinterest-p:hover {
+        background-color: #cb2027;
+    }
+    /* Tumblr button */
+    .fa-tumblr {
+        color: #32506d;
+    }
+    .fa-tumblr:hover {
+        background-color: #32506d;
+    }
+    /* Reddit button */
+    .fa-reddit-alien {
+        color: #ff4500;
+    }
+    .fa-reddit-alien:hover {
+        background-color: #ff4500;
+    }
+    /* LinkedIn button */
+    .fa-linkedin {
+        color: #007bb5;
+    }
+    .fa-linkedin:hover {
+        background-color: #007bb5;
+    }
+    /* Email button */
+    .fa-envelope {
+        color: #444444;
+    }
+    .fa-envelope:hover {
+        background-color: #444444;
+    }
+
+</style>
+<br>
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul id="markdown-toc">
@@ -178,8 +312,8 @@
   </div><div id="disqus_thread"></div>
   <script>
     var disqus_config = function () {
-      this.page.url = '/ml-on-aws-lambda-two-practices';
-      this.page.identifier = '/ml-on-aws-lambda-two-practices';
+      this.page.url = 'https://shaiperson.github.io/ml-on-aws-lambda-two-practices';
+      this.page.identifier = 'https://shaiperson.github.io/ml-on-aws-lambda-two-practices';
     };
 
     (function() {
