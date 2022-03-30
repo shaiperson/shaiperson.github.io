@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-30T01:10:15-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="/2022/03/28/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>/2022/03/28/ml-on-lambda-two-practices</id><content type="html" xml:base="/2022/03/28/ml-on-lambda-two-practices.html">&lt;ul id=&quot;markdown-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2022-03-30T01:21:44-03:00</updated><id>/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="/2022/03/28/ml-on-lambda-two-practices.html" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T12:55:00-03:00</published><updated>2022-03-28T12:55:00-03:00</updated><id>/2022/03/28/ml-on-lambda-two-practices</id><content type="html" xml:base="/2022/03/28/ml-on-lambda-two-practices.html">&lt;ul id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#observations&quot; id=&quot;markdown-toc-observations&quot;&gt;Observations&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#1-on-lambda-and-its-filesystem-feature&quot; id=&quot;markdown-toc-1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/a&gt;&lt;/li&gt;
@@ -123,35 +123,34 @@
   &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#implementation&quot; id=&quot;markdown-toc-implementation&quot;&gt;Implementation&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#runner-discovery&quot; id=&quot;markdown-toc-runner-discovery&quot;&gt;Runner Discovery&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#adapting-the-runners&quot; id=&quot;markdown-toc-adapting-the-runners&quot;&gt;Adapting the runners&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot; id=&quot;markdown-toc-like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot;&gt;Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/a&gt;    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;#environment-related-code&quot; id=&quot;markdown-toc-environment-related-code&quot;&gt;Environment-related code&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#complying-with-the-adapter-convention&quot; id=&quot;markdown-toc-complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#packaging-runners&quot; id=&quot;markdown-toc-packaging-runners&quot;&gt;Packaging runners&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#adapting-the-runners&quot; id=&quot;markdown-toc-adapting-the-runners&quot;&gt;Adapting the runners&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#environment-related-code&quot; id=&quot;markdown-toc-environment-related-code&quot;&gt;Environment-related code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#complying-with-the-adapter-convention&quot; id=&quot;markdown-toc-complying-with-the-adapter-convention&quot;&gt;Complying with the adapter convention&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#packaging-runners&quot; id=&quot;markdown-toc-packaging-runners&quot;&gt;Packaging runners&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#adapting-the-controller&quot; id=&quot;markdown-toc-adapting-the-controller&quot;&gt;Adapting the controller&lt;/a&gt;&lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#dockerization-compose-file&quot; id=&quot;markdown-toc-dockerization-compose-file&quot;&gt;Dockerization, Compose File&lt;/a&gt;&lt;/li&gt;
       &lt;li&gt;&lt;a href=&quot;#quick-test&quot; id=&quot;markdown-toc-quick-test&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#adding-some-algorithms&quot; id=&quot;markdown-toc-adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/a&gt;        &lt;ul&gt;
-          &lt;li&gt;&lt;a href=&quot;#in-an-existing-runner-container&quot; id=&quot;markdown-toc-in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/a&gt;            &lt;ul&gt;
-              &lt;li&gt;&lt;a href=&quot;#algorithm-code&quot; id=&quot;markdown-toc-algorithm-code&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;a href=&quot;#algorithm-integration&quot; id=&quot;markdown-toc-algorithm-integration&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;a href=&quot;#quick-test-1&quot; id=&quot;markdown-toc-quick-test-1&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/li&gt;
-          &lt;li&gt;&lt;a href=&quot;#in-a-new-runner-container&quot; id=&quot;markdown-toc-in-a-new-runner-container&quot;&gt;In a new runner container&lt;/a&gt;            &lt;ul&gt;
-              &lt;li&gt;&lt;a href=&quot;#algorithm-code-1&quot; id=&quot;markdown-toc-algorithm-code-1&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;a href=&quot;#algorithm-integration-1&quot; id=&quot;markdown-toc-algorithm-integration-1&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
-              &lt;li&gt;&lt;a href=&quot;#quick-test-2&quot; id=&quot;markdown-toc-quick-test-2&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#bonus-free-schemas-&quot; id=&quot;markdown-toc-bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#adding-some-algorithms&quot; id=&quot;markdown-toc-adding-some-algorithms&quot;&gt;Adding some algorithms!&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#in-an-existing-runner-container&quot; id=&quot;markdown-toc-in-an-existing-runner-container&quot;&gt;In an existing runner container&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-code&quot; id=&quot;markdown-toc-algorithm-code&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-integration&quot; id=&quot;markdown-toc-algorithm-integration&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#quick-test-1&quot; id=&quot;markdown-toc-quick-test-1&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#in-a-new-runner-container&quot; id=&quot;markdown-toc-in-a-new-runner-container&quot;&gt;In a new runner container&lt;/a&gt;        &lt;ul&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-code-1&quot; id=&quot;markdown-toc-algorithm-code-1&quot;&gt;Algorithm code&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#algorithm-integration-1&quot; id=&quot;markdown-toc-algorithm-integration-1&quot;&gt;Algorithm integration&lt;/a&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;a href=&quot;#quick-test-2&quot; id=&quot;markdown-toc-quick-test-2&quot;&gt;Quick test&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bonus-free-schemas-&quot; id=&quot;markdown-toc-bonus-free-schemas-&quot;&gt;Bonus: free schemas ✨&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#summary&quot; id=&quot;markdown-toc-summary&quot;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
@@ -228,7 +227,7 @@
 
 &lt;p&gt;As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.&lt;/p&gt;
 
-&lt;h1 id=&quot;like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities&quot;&gt;Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/h1&gt;
+&lt;p&gt;Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to &lt;em&gt;single-source&lt;/em&gt; those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.&lt;/p&gt;
 
 &lt;p&gt;Working with Python, the way we’ll do this is to develop a separate Python project that takes care of all environment-related work. We’ll then package that project as a dependency that can be installed in each runner container using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pip&lt;/code&gt;. This package will be called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runnerlib&lt;/code&gt;.&lt;/p&gt;
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Extensible Worker Pattern 3/3"
-subtitle: "Applying the full pattern and testing its extensibility"
+subtitle: "Applying the full pattern with dynamic discovery and Python inspection, testing its extensibility"
 date: 2022-03-09 12:55:00 -0300
 highlights:
     - Python
@@ -96,7 +96,7 @@ async def get_registry():
  
 As we've seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they're reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.
  
-# Like we hinted at in Part 1 when going over the pattern's theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to _single-source_ those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they're automatically enhanced with those capabilities.
+Like we hinted at in Part 1 when going over the pattern's theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to _single-source_ those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they're automatically enhanced with those capabilities.
  
 Working with Python, the way we'll do this is to develop a separate Python project that takes care of all environment-related work. We'll then package that project as a dependency that can be installed in each runner container using `pip`. This package will be called `runnerlib`.
 

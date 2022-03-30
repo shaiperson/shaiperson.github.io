@@ -65,35 +65,34 @@
   <li><a href="#introduction" id="markdown-toc-introduction">Introduction</a></li>
   <li><a href="#implementation" id="markdown-toc-implementation">Implementation</a>    <ul>
       <li><a href="#runner-discovery" id="markdown-toc-runner-discovery">Runner Discovery</a></li>
-      <li><a href="#adapting-the-runners" id="markdown-toc-adapting-the-runners">Adapting the runners</a></li>
-    </ul>
-  </li>
-  <li><a href="#like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities" id="markdown-toc-like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities">Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to <em>single-source</em> those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.</a>    <ul>
-      <li><a href="#environment-related-code" id="markdown-toc-environment-related-code">Environment-related code</a></li>
-      <li><a href="#complying-with-the-adapter-convention" id="markdown-toc-complying-with-the-adapter-convention">Complying with the adapter convention</a></li>
-      <li><a href="#packaging-runners" id="markdown-toc-packaging-runners">Packaging runners</a></li>
+      <li><a href="#adapting-the-runners" id="markdown-toc-adapting-the-runners">Adapting the runners</a>        <ul>
+          <li><a href="#environment-related-code" id="markdown-toc-environment-related-code">Environment-related code</a></li>
+          <li><a href="#complying-with-the-adapter-convention" id="markdown-toc-complying-with-the-adapter-convention">Complying with the adapter convention</a></li>
+          <li><a href="#packaging-runners" id="markdown-toc-packaging-runners">Packaging runners</a></li>
+        </ul>
+      </li>
       <li><a href="#adapting-the-controller" id="markdown-toc-adapting-the-controller">Adapting the controller</a></li>
       <li><a href="#dockerization-compose-file" id="markdown-toc-dockerization-compose-file">Dockerization, Compose File</a></li>
       <li><a href="#quick-test" id="markdown-toc-quick-test">Quick test</a></li>
-      <li><a href="#adding-some-algorithms" id="markdown-toc-adding-some-algorithms">Adding some algorithms!</a>        <ul>
-          <li><a href="#in-an-existing-runner-container" id="markdown-toc-in-an-existing-runner-container">In an existing runner container</a>            <ul>
-              <li><a href="#algorithm-code" id="markdown-toc-algorithm-code">Algorithm code</a></li>
-              <li><a href="#algorithm-integration" id="markdown-toc-algorithm-integration">Algorithm integration</a></li>
-              <li><a href="#quick-test-1" id="markdown-toc-quick-test-1">Quick test</a></li>
-            </ul>
-          </li>
-          <li><a href="#in-a-new-runner-container" id="markdown-toc-in-a-new-runner-container">In a new runner container</a>            <ul>
-              <li><a href="#algorithm-code-1" id="markdown-toc-algorithm-code-1">Algorithm code</a></li>
-              <li><a href="#algorithm-integration-1" id="markdown-toc-algorithm-integration-1">Algorithm integration</a></li>
-              <li><a href="#quick-test-2" id="markdown-toc-quick-test-2">Quick test</a></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li><a href="#bonus-free-schemas-" id="markdown-toc-bonus-free-schemas-">Bonus: free schemas ✨</a></li>
-      <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
     </ul>
   </li>
+  <li><a href="#adding-some-algorithms" id="markdown-toc-adding-some-algorithms">Adding some algorithms!</a>    <ul>
+      <li><a href="#in-an-existing-runner-container" id="markdown-toc-in-an-existing-runner-container">In an existing runner container</a>        <ul>
+          <li><a href="#algorithm-code" id="markdown-toc-algorithm-code">Algorithm code</a></li>
+          <li><a href="#algorithm-integration" id="markdown-toc-algorithm-integration">Algorithm integration</a></li>
+          <li><a href="#quick-test-1" id="markdown-toc-quick-test-1">Quick test</a></li>
+        </ul>
+      </li>
+      <li><a href="#in-a-new-runner-container" id="markdown-toc-in-a-new-runner-container">In a new runner container</a>        <ul>
+          <li><a href="#algorithm-code-1" id="markdown-toc-algorithm-code-1">Algorithm code</a></li>
+          <li><a href="#algorithm-integration-1" id="markdown-toc-algorithm-integration-1">Algorithm integration</a></li>
+          <li><a href="#quick-test-2" id="markdown-toc-quick-test-2">Quick test</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#bonus-free-schemas-" id="markdown-toc-bonus-free-schemas-">Bonus: free schemas ✨</a></li>
+  <li><a href="#summary" id="markdown-toc-summary">Summary</a></li>
 </ul>
 
 <h2 id="introduction">Introduction</h2>
@@ -170,7 +169,7 @@
 
 <p>As we’ve seen, to adapt the runner components to this pattern they need to notify the Runner Discovery component of the URI on which they’re reachable and the algorithms that they support. This is in addition to still exposing the algorithms on HTTP endpoints for the controler to send requests on and running the algorithms themselves.</p>
 
-<h1 id="like-we-hinted-at-in-part-1-when-going-over-the-patterns-theory-the-only-way-we-can-really-make-a-setup-such-as-this-reasonable-enough-to-develop-and-maintain-is-to-single-source-those-environment-related-responsibilities-of-integration-with-the-discovery-and-controller-components-in-other-words-we-want-to-develop-and-version-the-code-for-these-responsibilities-separately-from-the-runners-themselves-and-somehow-package-the-runners-with-it-so-that-theyre-automatically-enhanced-with-those-capabilities">Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to <em>single-source</em> those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.</h1>
+<p>Like we hinted at in Part 1 when going over the pattern’s theory, the only way we can really make a setup such as this reasonable enough to develop and maintain is to <em>single-source</em> those environment-related responsibilities of integration with the Discovery and Controller components. In other words, we want to develop and version the code for these responsibilities separately from the runners themselves, and somehow package the runners with it so that they’re automatically enhanced with those capabilities.</p>
 
 <p>Working with Python, the way we’ll do this is to develop a separate Python project that takes care of all environment-related work. We’ll then package that project as a dependency that can be installed in each runner container using <code class="language-plaintext highlighter-rouge">pip</code>. This package will be called <code class="language-plaintext highlighter-rouge">runnerlib</code>.</p>
 
