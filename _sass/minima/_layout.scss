@@ -257,6 +257,12 @@
   @include relative-font-size(1.5);
 }
 
+.post-like-button {
+  display: flex;
+  //flex-direction: row-reverse;
+  margin-right: 2em;
+}
+
 .masthead-container {
   display: flex;
   flex-direction: column;
