@@ -245,6 +245,13 @@
   margin-left: 4px;
 }
 
+.post-highlight-content-monospace {
+  margin-top: 0;
+  font-family: monospace;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
 .post-link {
   display: block;
   @include relative-font-size(1.5);

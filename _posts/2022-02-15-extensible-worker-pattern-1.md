@@ -2,7 +2,7 @@
 layout: post
 title: "Extensible Worker Pattern 1/3"
 subtitle: "Motivation and theory for a worker design pattern geared towards extensibility"
-date: 2022-02-15 12:55:00 -0300
+permalink: /extensible-worker-part-1
 highlights:
     - ML Ops
     - Architecture

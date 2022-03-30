@@ -2,7 +2,7 @@
 layout: post
 title: "ML on AWS Lambda: Two Practices"
 subtitle: "Avoid the filesystem trap"
-date: 2022-03-28 12:55:00 -0300
+permalink: ml-on-aws-lambda-two-practices
 highlights:
   - AWS Lambda
   - AWS S3

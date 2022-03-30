@@ -138,6 +138,8 @@ table td { border: 1px solid #e8e8e8; }
 
 .post-highlight-content { margin-top: 0; margin-right: 4px; margin-left: 4px; }
 
+.post-highlight-content-monospace { margin-top: 0; font-family: monospace; margin-right: 4px; margin-left: 4px; }
+
 .post-link { display: block; font-size: 24px; }
 
 .masthead-container { display: flex; flex-direction: column; }

@@ -2,7 +2,7 @@
 layout: post
 title: "Extensible Worker Pattern 2/3"
 subtitle: "A meme classifier and a naïve implementation of a worker environment to deploy it to"
-date: 2022-03-02 12:55:00 -0300
+permalink: /extensible-worker-part-2
 highlights:
     - Python
     - FastAPI

@@ -9,15 +9,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Note" />
 <meta property="og:description" content="Note" />
-<link rel="canonical" href="/2022/03/09/extensible-worker-pattern-3.html" />
-<meta property="og:url" content="/2022/03/09/extensible-worker-pattern-3.html" />
+<link rel="canonical" href="/extensible-worker-part-3" />
+<meta property="og:url" content="/extensible-worker-part-3" />
 <meta property="og:site_name" content="Blog" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2022-03-09T12:55:00-03:00" />
+<meta property="article:published_time" content="2022-03-09T00:00:00-03:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Extensible Worker Pattern 3/3" />
 <script type="application/ld+json">
-{"datePublished":"2022-03-09T12:55:00-03:00","mainEntityOfPage":{"@type":"WebPage","@id":"/2022/03/09/extensible-worker-pattern-3.html"},"url":"/2022/03/09/extensible-worker-pattern-3.html","description":"Note","headline":"Extensible Worker Pattern 3/3","dateModified":"2022-03-09T12:55:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"url":"/extensible-worker-part-3","mainEntityOfPage":{"@type":"WebPage","@id":"/extensible-worker-part-3"},"description":"Note","headline":"Extensible Worker Pattern 3/3","dateModified":"2022-03-09T00:00:00-03:00","datePublished":"2022-03-09T00:00:00-03:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -42,7 +42,7 @@
   <header class="post-header">
     <h1 class="post-title p-name" itemprop="name headline">Extensible Worker Pattern 3/3</h1>
     <p class="post-meta">
-      <time class="dt-published" datetime="2022-03-09T12:55:00-03:00" itemprop="datePublished">Mar 9, 2022
+      <time class="dt-published" datetime="2022-03-09T00:00:00-03:00" itemprop="datePublished">Mar 9, 2022
       </time></p>
   </header>
 
@@ -736,7 +736,7 @@ nlp-runner algorithm schemas:
 
 <p>To sum up, we went through the implementation of a pattern for algorithm-running worker environments that is very easy to extend with new algorithms. Aside from algorithm code and dependencies and a few configuration parameters settable by environment variables, the only necessary step to add an algorithm to an environment is to list it once in a special “adapter” module following a simple convention. Once that’s done, the algorithm gets discovered automatically by all relevant components in the environment and is made available to do work on data. In addition, Pydantic models get automatically generated for all algorithms in runtime. By leveraging Pydantic and FastAPI, these models are used to validate requests sent to algorithm runners and can be used to quickly get JSON schemas of payloads expected by all algorithms in the environment to aid debugging and creating documentation.</p>
 
-  </div><a class="u-url" href="/2022/03/09/extensible-worker-pattern-3.html" hidden></a>
+  </div><a class="u-url" href="/extensible-worker-part-3" hidden></a>
 </article>
 
       </div>

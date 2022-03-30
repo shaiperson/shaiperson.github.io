@@ -1,10 +1,11 @@
 ---
 layout: post
 title: "Extensible Worker Pattern 3/3"
-subtitle: "Applying the full pattern with dynamic discovery and Python inspection, testing its extensibility"
-date: 2022-03-09 12:55:00 -0300
+subtitle: "Applying the full pattern with automatic discovery and dynamic Pydantic model generation, testing its extensibility"
+permalink: /extensible-worker-part-3
 highlights:
     - Python
+    - inspect
     - FastAPI
     - Docker
     - Pydantic
