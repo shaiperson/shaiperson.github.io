@@ -3,6 +3,7 @@ layout: post
 title: "ML on AWS Lambda: Two Practices"
 subtitle: "Avoid the filesystem trap"
 permalink: ml-on-aws-lambda-two-practices
+comments: true
 highlights:
   - AWS Lambda
   - AWS S3

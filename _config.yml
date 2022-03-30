@@ -36,6 +36,9 @@ google_analytics: G-WCKF8CFPVZ
 #plugins:
 #  - jekyll-feed
 
+disqus:
+  shortname: blog-5wau4acajq
+
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
