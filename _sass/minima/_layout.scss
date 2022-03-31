@@ -208,7 +208,8 @@
 }
 
 .post-meta {
-  margin-left: 1em;
+  display: flex;
+  flex-direction: column;
 }
 
 .post-meta-section {
@@ -255,6 +256,16 @@
 .post-link {
   display: block;
   @include relative-font-size(1.5);
+}
+
+.read-time {
+  font-size: large;
+  color: #5c5c5c;
+  margin-bottom: 0.75em;
+  margin-top: 1em;
+  font-style: italic;
+  font-weight: 200;
+  font-size: 0.8em;
 }
 
 //.share-page {

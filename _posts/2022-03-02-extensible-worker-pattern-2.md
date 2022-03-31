@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Extensible Worker Pattern 2/3"
-subtitle: "A meme classifier ✨ and a naïve implementation of a worker environment to deploy it to"
+subtitle: "A naïve implementation of a worker environment and deploying an algorithm to it"
 permalink: /extensible-worker-part-2
 highlights:
     - Python

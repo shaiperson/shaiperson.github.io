@@ -37,18 +37,22 @@ layout: default
             {{ post.title | escape }}
           </a>
         </h3>
-<!--          <div class="post-meta">-->
+      <div class="post-meta">
         <span class="post-subtitle">{{ post.subtitle }}</span>
-      <div>
-          {% for hl in post.highlights %}
-          <span class="post-highlight">
-        <span class="post-highlight-content">
-          {{ hl }}
-        </span>
-      </span>
-          {% endfor %}
+
+          <div>
+              {% for hl in post.highlights %}
+                <span class="post-highlight">
+                    <span class="post-highlight-content">
+                      {{ hl }}
+                    </span>
+                </span>
+                {% endfor %}
+          </div>
+          <div class="read-time">
+              {% include read-time.html content=post.content %}
+          </div>
       </div>
-<!--          </div>-->
         {%- if site.show_excerpts -%}
           {{ post.excerpt }}
         {%- endif -%}
