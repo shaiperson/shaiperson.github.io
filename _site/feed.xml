@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://shaiperson.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://shaiperson.github.io/" rel="alternate" type="text/html" /><updated>2022-04-02T00:15:18-03:00</updated><id>https://shaiperson.github.io/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><author><name>Shai Bianchi</name></author><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="https://shaiperson.github.io/ml-on-aws-lambda-two-practices" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T00:00:00-03:00</published><updated>2022-03-28T00:00:00-03:00</updated><id>https://shaiperson.github.io/ml-on-lambda-two-practices</id><content type="html" xml:base="https://shaiperson.github.io/ml-on-aws-lambda-two-practices">&lt;ul id=&quot;markdown-toc&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://shaiperson.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://shaiperson.github.io/" rel="alternate" type="text/html" /><updated>2022-04-02T00:49:30-03:00</updated><id>https://shaiperson.github.io/feed.xml</id><title type="html">Blog</title><subtitle>MS in Computer Science, freelance engineer and entrepreneur</subtitle><author><name>Shai Bianchi</name></author><entry><title type="html">ML on AWS Lambda: Two Practices</title><link href="https://shaiperson.github.io/ml-on-aws-lambda-two-practices" rel="alternate" type="text/html" title="ML on AWS Lambda: Two Practices" /><published>2022-03-28T00:00:00-03:00</published><updated>2022-03-28T00:00:00-03:00</updated><id>https://shaiperson.github.io/ml-on-lambda-two-practices</id><content type="html" xml:base="https://shaiperson.github.io/ml-on-aws-lambda-two-practices">&lt;ul id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot; id=&quot;markdown-toc-introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#observations&quot; id=&quot;markdown-toc-observations&quot;&gt;Observations&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#1-on-lambda-and-its-filesystem-feature&quot; id=&quot;markdown-toc-1-on-lambda-and-its-filesystem-feature&quot;&gt;1. On Lambda and its filesystem feature&lt;/a&gt;&lt;/li&gt;
@@ -971,15 +971,13 @@ nlp-runner algorithm schemas:
 
 &lt;h4 id=&quot;controller-dockerfile&quot;&gt;Controller Dockerfile&lt;/h4&gt;
 
-&lt;div class=&quot;language-dockerfile highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; tensorflow/tensorflow&lt;/span&gt;
+&lt;div class=&quot;language-dockerfile highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; python:3.7&lt;/span&gt;
 
 &lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /opt/project&lt;/span&gt;
 
-&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./requirements.txt requirements.txt&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--no-cache-dir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--upgrade&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; requirements.txt
-&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;pillow
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; requirements.txt .&lt;/span&gt;
 
-&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./model ./model&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; requirements.txt
 
 &lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./* ./&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -990,10 +988,11 @@ nlp-runner algorithm schemas:
 
 &lt;span class=&quot;k&quot;&gt;WORKDIR&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; /opt/project&lt;/span&gt;
 
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./requirements.txt requirements.txt&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--no-cache-dir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--upgrade&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; requirements.txt
 &lt;span class=&quot;k&quot;&gt;RUN &lt;/span&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;pillow
 
-&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./* ./&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./model ./model&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;COPY&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; ./ ./&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h4 id=&quot;compose-file&quot;&gt;Compose file&lt;/h4&gt;

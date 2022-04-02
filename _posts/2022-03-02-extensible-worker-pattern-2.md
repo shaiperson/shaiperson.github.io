@@ -181,15 +181,13 @@ I tend to favor containerizing all components that go into a worker setup as thi
 #### Controller Dockerfile
 
 ```dockerfile
-FROM tensorflow/tensorflow
+FROM python:3.7
 
 WORKDIR /opt/project
 
-COPY ./requirements.txt requirements.txt
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN pip install pillow
+COPY requirements.txt .
 
-COPY ./model ./model
+RUN pip install -r requirements.txt
 
 COPY ./* ./
 ```
@@ -201,10 +199,11 @@ FROM tensorflow/tensorflow
 
 WORKDIR /opt/project
 
+COPY ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN pip install pillow
 
-COPY ./* ./
-COPY ./model ./model
+COPY ./ ./
 ```
 
 #### Compose file
