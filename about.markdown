@@ -4,8 +4,6 @@ title: About
 permalink: /about/
 ---
 
-Ms in Computer Science, software engineer and entrepreneur.
-
 Within tech, I'm mostly interested AI engineering, back-end development and entrepreneurship.
 Outside it I enjoy making music and writing and am avidly into the curiously specific genre of English Language XIX Century literature. Currently based in [Buenos Aires, Argentina](https://goo.gl/maps/R1X5iSVpRgEjCULG6).
 
